@@ -112,27 +112,29 @@ const StackNav = () => {
     }
 
     return (
-        <Stack.Navigator screenOptions={screenOptionsStack} initialRouteName={authState.isAuthenticated ? 'Saved Manhwas Ongoing' : 'Home'}>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Saved Manhwas Ongoing" component={LazySavedScreenOngoing} options={{ title: 'Saved Manhwas Ongoing' }} />
+        <View style={{ flex: 1, height: "100%", width: "100%" }} collapsable={false}>
+            <Stack.Navigator screenOptions={screenOptionsStack} initialRouteName={authState.isAuthenticated ? 'Saved Manhwas Ongoing' : 'Home'}>
+                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="Saved Manhwas Ongoing" component={LazySavedScreenOngoing} options={{ title: 'Saved Manhwas Ongoing' }} />
 
-            <Stack.Screen name="Search" component={LazySearchScreen} options={{ title: 'Latest Manhwas' }} />
-            <Stack.Screen name="Latest" component={LazyLatestScreen} options={{ title: 'Latest Manhwas' }} />
-            <Stack.Screen name="Saved Manhwas All" component={LazySavedScreenAll} options={{ title: 'Saved Manhwas All' }} />
-            <Stack.Screen name="Saved Manhwas Try" component={LazySavedScreenTry} options={{ title: 'Saved Manhwas Try' }} />
-            <Stack.Screen name="Saved Manhwas Later" component={LazySavedScreenLater} options={{ title: 'Saved Manhwas Later' }} />
-            <Stack.Screen name="Saved Manhwas Hiatus" component={LazySavedScreenHiatus} options={{ title: 'Saved Manhwas Hiatus' }} />
-            <Stack.Screen name="Saved Manhwas UpToDate" component={LazySavedScreenUpToDate} options={{ title: 'Saved Manhwas Up-To-Date' }} />
-            <Stack.Screen name="Saved Manhwas Completed" component={LazySavedScreenCompleted} options={{ title: 'Saved Manhwas Completed' }} />
-            <Stack.Screen name="Login" component={LazyLoginScreen} options={{ title: 'Saved Manhwas Completed' }} />
-            {/* <Stack.Screen name="Latest" component={LatestScreen} /> */}
-            {/* <Stack.Screen name="Saved Manhwas All" component={SavedScreenAll} options={{ title: 'Saved Manhwas All' }} /> */}
-            {/* <Stack.Screen name="Saved Manhwas Try" component={SavedScreenTry} options={{ title: 'Saved Manhwas Try' }} />
+                <Stack.Screen name="Search" component={LazySearchScreen} options={{ title: 'Latest Manhwas' }} />
+                <Stack.Screen name="Latest" component={LazyLatestScreen} options={{ title: 'Latest Manhwas' }} />
+                <Stack.Screen name="Saved Manhwas All" component={LazySavedScreenAll} options={{ title: 'Saved Manhwas All' }} />
+                <Stack.Screen name="Saved Manhwas Try" component={LazySavedScreenTry} options={{ title: 'Saved Manhwas Try' }} />
+                <Stack.Screen name="Saved Manhwas Later" component={LazySavedScreenLater} options={{ title: 'Saved Manhwas Later' }} />
+                <Stack.Screen name="Saved Manhwas Hiatus" component={LazySavedScreenHiatus} options={{ title: 'Saved Manhwas Hiatus' }} />
+                <Stack.Screen name="Saved Manhwas UpToDate" component={LazySavedScreenUpToDate} options={{ title: 'Saved Manhwas Up-To-Date' }} />
+                <Stack.Screen name="Saved Manhwas Completed" component={LazySavedScreenCompleted} options={{ title: 'Saved Manhwas Completed' }} />
+                <Stack.Screen name="Login" component={LazyLoginScreen} options={{ title: 'Saved Manhwas Completed' }} />
+                {/* <Stack.Screen name="Latest" component={LatestScreen} /> */}
+                {/* <Stack.Screen name="Saved Manhwas All" component={SavedScreenAll} options={{ title: 'Saved Manhwas All' }} /> */}
+                {/* <Stack.Screen name="Saved Manhwas Try" component={SavedScreenTry} options={{ title: 'Saved Manhwas Try' }} />
             <Stack.Screen name="Saved Manhwas Later" component={SavedScreenLater} options={{ title: 'Saved Manhwas Later' }} />
             <Stack.Screen name="Saved Manhwas Hiatus" component={SavedScreenHiatus} options={{ title: 'Saved Manhwas Hiatus' }} />
             <Stack.Screen name="Saved Manhwas UpToDate" component={SavedScreenUpToDate} options={{ title: 'Saved Manhwas Up-To-Date' }} />
             <Stack.Screen name="Saved Manhwas Completed" component={SavedScreenCompleted} options={{ title: 'Saved Manhwas Completed' }} /> */}
-        </Stack.Navigator>
+            </Stack.Navigator>
+        </View>
     )
 }
 

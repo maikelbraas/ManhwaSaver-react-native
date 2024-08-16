@@ -10,21 +10,14 @@ const ITEM_HEIGHT = 480;
 export default React.memo(function SavedScreenTemplate({ filterFunction, categoryName }) {
 
     const scrollRef = useRef();
-    const { savedManhwas, isLoading, refreshManhwas } = useManhwas();
-
-    // const [isReady, setIsReady] = useState(false);
-
-    // useEffect(() => {
-    //     if (savedManhwas && savedManhwas.length > 0)
-    //         setIsReady(true);
-    // }, [savedManhwas]);
+    const { savedManhwas, isLoading, fetchSavedManhwas } = useManhwas();
 
     const getItemLayout = (data, index) => (
         { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     );
 
     const card = ({ item }) => (<ManhwaCardSaved item={item} />);
-    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={refreshManhwas} />;
+    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={fetchSavedManhwas} />;
     const keyExtractor = item => item.mid;
 
     const filteredManhwas = useMemo(() => {
@@ -34,21 +27,21 @@ export default React.memo(function SavedScreenTemplate({ filterFunction, categor
                 return manhwa;
             }
         });
-    }, [savedManhwas, filterFunction, categoryName]);
+    }, [savedManhwas, filterFunction, categoryName])
 
-    if (isLoading || savedManhwas.length == 0) {
+    if (isLoading || filteredManhwas.length == 0) {
         return <CustomLoadingScreen text='Is loading manhwas...' />;
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} collapsable={false}>
             <FlatList
                 keyboardShouldPersistTaps='handled'
                 data={filteredManhwas}
                 keyExtractor={keyExtractor}
                 initialNumToRender={3}
                 renderItem={card}
-                // windowSize={3}
+                windowSize={3}
                 ref={scrollRef}
                 removeClippedSubviews={true}
                 getItemLayout={getItemLayout}

@@ -87,7 +87,6 @@ export default React.memo(function ManhwaCardSaved({ item }) {
         }
     }
 
-    const decodedContent = React.useMemo(() => decodeHtmlCharCodes(item.content), [item.content]);
     return (
         <View style={styles.itemContainer}>
             <View style={[styles.item, styles.titleContainer]}>
