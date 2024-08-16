@@ -4,22 +4,28 @@ import ManhwaCard from '../Components/ManhwaCard';
 import Pagination from '../Components/Pagination';
 import { RefreshControl } from 'react-native-gesture-handler';
 import { useManhwas } from '../Components/ManhwaContext';
+import CustomLoadingScreen from '../Components/CustomLoadingScreen';
 
 export default React.memo(function HomeScreen() {
     const ITEM_HEIGHT = 480;
     const scrollRef = useRef();
-    const { allManhwas, isLoading, refreshManhwas, currentPage, totalPages, setPage } = useManhwas();
+    const { allManhwas, isLoading, fetchAllManhwas, currentPage, totalPages, setCurrentPage } = useManhwas();
     const getItemLayout = (data, index) => (
         { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     )
     const card = useCallback(({ item }) => (<ManhwaCard item={item} />), []);
-    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={refreshManhwas} />;
+    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => { setCurrentPage(1); fetchAllManhwas(1) }} />;
     const keyExtractor = item => item.mid;
 
     const handlePageClick = useCallback((p) => {
-        setPage(p);
-        scrollRef.current.scrollToOffset({ y: 0, animated: false });
-    }, [setPage]);
+        fetchAllManhwas(p)
+        setCurrentPage(p);
+        scrollRef.current.scrollToOffset({ y: 0, animated: true });
+    }, [setCurrentPage]);
+
+    if (isLoading || allManhwas.length === 0) {
+        return <CustomLoadingScreen text='Loading manhwas...' />;
+    }
 
     return (
         <SafeAreaView style={styles.container}>

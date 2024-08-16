@@ -9,19 +9,22 @@ import CustomLoadingScreen from '../Components/CustomLoadingScreen';
 export default React.memo(function LatestScreen() {
     const ITEM_HEIGHT = 480;
     const scrollRef = useRef();
-    const { latestManhwas, isLoading, refreshManhwas, currentPage, totalPagesLatest, setPage } = useManhwas();
+    const { latestManhwas, isLoading, fetchLatest, currentPage, totalPagesLatest, setPage } = useManhwas();
     const getItemLayout = (data, index) => (
         { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     )
     const card = ({ item }) => (<ManhwaCard item={item} />);
-    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={refreshManhwas} />;
+    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={fetchLatest} />;
     const keyExtractor = item => item.mid;
 
     const handlePageClick = useCallback((p) => {
         setPage(p);
-        scrollRef.current.scrollToOffset({ y: 0, animated: false });
+        scrollRef.current.scrollToOffset({ y: 0, animated: true });
     }, [setPage]);
 
+    if (isLoading || latestManhwas.length === 0) {
+        return <CustomLoadingScreen text='Loading manhwas...' />;
+    }
     return (
         <SafeAreaView style={styles.container}>
             <FlatList keyboardShouldPersistTaps='handled'

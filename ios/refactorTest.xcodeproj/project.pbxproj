@@ -15,6 +15,7 @@
 		7699B88040F8A987B510C191 /* libPods-refactorTest-refactorTestTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-refactorTest-refactorTestTests.a */; };
 		7A25631F650B7CCF9D422D58 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D2AA86B0BD53C1F419FE8853 /* PrivacyInfo.xcprivacy */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		FF4461EA2C6FF09C0055229E /* splash_screen.png in Resources */ = {isa = PBXBuildFile; fileRef = FF4461E92C6FF09C0055229E /* splash_screen.png */; };
 		FFE39A652C6BC46D00D83A7E /* android-chrome-192x192.png in Resources */ = {isa = PBXBuildFile; fileRef = FFE39A642C6BC46D00D83A7E /* android-chrome-192x192.png */; };
 		FFE39A7A2C6BCC8500D83A7E /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FFE39A662C6BCC8500D83A7E /* AntDesign.ttf */; };
 		FFE39A7B2C6BCC8500D83A7E /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FFE39A672C6BCC8500D83A7E /* Entypo.ttf */; };
@@ -67,6 +68,7 @@
 		89C6BE57DB24E9ADA2F236DE /* Pods-refactorTest-refactorTestTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-refactorTest-refactorTestTests.release.xcconfig"; path = "Target Support Files/Pods-refactorTest-refactorTestTests/Pods-refactorTest-refactorTestTests.release.xcconfig"; sourceTree = "<group>"; };
 		D2AA86B0BD53C1F419FE8853 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = refactorTest/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		FF4461E92C6FF09C0055229E /* splash_screen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = splash_screen.png; path = refactorTest/Images.xcassets/splash_screen.png; sourceTree = "<group>"; };
 		FFE39A642C6BC46D00D83A7E /* android-chrome-192x192.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "android-chrome-192x192.png"; path = "refactorTest/android-chrome-192x192.png"; sourceTree = "<group>"; };
 		FFE39A662C6BCC8500D83A7E /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AntDesign.ttf; sourceTree = "<group>"; };
 		FFE39A672C6BCC8500D83A7E /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Entypo.ttf; sourceTree = "<group>"; };
@@ -134,6 +136,7 @@
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
+				FF4461E92C6FF09C0055229E /* splash_screen.png */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				FFE39A642C6BC46D00D83A7E /* android-chrome-192x192.png */,
@@ -329,6 +332,7 @@
 				7A25631F650B7CCF9D422D58 /* PrivacyInfo.xcprivacy in Resources */,
 				FFE39A7D2C6BCC8500D83A7E /* Feather.ttf in Resources */,
 				FFE39A892C6BCC8500D83A7E /* MaterialIcons.ttf in Resources */,
+				FF4461EA2C6FF09C0055229E /* splash_screen.png in Resources */,
 				FFE39A812C6BCC8500D83A7E /* FontAwesome5_Solid.ttf in Resources */,
 				FFE39A8B2C6BCC8500D83A7E /* SimpleLineIcons.ttf in Resources */,
 				FFE39A7A2C6BCC8500D83A7E /* AntDesign.ttf in Resources */,
@@ -688,10 +692,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -763,10 +764,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

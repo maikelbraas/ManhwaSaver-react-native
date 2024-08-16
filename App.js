@@ -151,7 +151,9 @@ const DrawerNav = () => {
 
 function App() {
     useEffect(() => {
-        SplashScreen.hide();
+        setTimeout(() => {
+            SplashScreen.hide();
+        }, 500)
     }, []);
 
     return (

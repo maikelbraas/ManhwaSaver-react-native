@@ -29,8 +29,8 @@ export default React.memo(function SavedScreenTemplate({ filterFunction, categor
         });
     }, [savedManhwas, filterFunction, categoryName])
 
-    if (isLoading || filteredManhwas.length == 0) {
-        return <CustomLoadingScreen text='Is loading manhwas...' />;
+    if (isLoading || filteredManhwas.length === 0) {
+        return <CustomLoadingScreen text='Loading manhwas...' />;
     }
 
     return (
@@ -41,9 +41,9 @@ export default React.memo(function SavedScreenTemplate({ filterFunction, categor
                 keyExtractor={keyExtractor}
                 initialNumToRender={3}
                 renderItem={card}
-                windowSize={3}
+                // windowSize={3}
                 ref={scrollRef}
-                removeClippedSubviews={true}
+                // removeClippedSubviews={true}
                 getItemLayout={getItemLayout}
                 refreshControl={refreshControl}
             />
