@@ -8,7 +8,7 @@ import { showMessage } from 'react-native-flash-message';
 
 export default React.memo(function ManhwaCardSaved({ item }) {
     const [number, onChangeNumber] = useState('');
-    const { refreshManhwas } = useManhwas();
+    const { fetchSavedManhwas } = useManhwas();
 
     const confirmRemove = useCallback(() => {
         Alert.alert('Remove Manhwa', `Are you sure you want to remove:\n${item.title}`, [
@@ -44,11 +44,11 @@ export default React.memo(function ManhwaCardSaved({ item }) {
                 duration: 2000, // Duration in milliseconds
                 position: 'bottom'
             });
-            refreshManhwas()
+            fetchSavedManhwas()
         } catch (err) {
             console.error(err)
         }
-    }, [item.mid, refreshManhwas])
+    }, [item.mid, fetchSavedManhwas])
 
     const handleLater = useCallback(async () => {
         try {
@@ -62,16 +62,15 @@ export default React.memo(function ManhwaCardSaved({ item }) {
                 duration: 2000, // Duration in milliseconds
                 position: 'bottom'
             });
-            refreshManhwas()
+            fetchSavedManhwas()
         } catch (err) {
             console.error(err)
         }
-    }, [item.mid, refreshManhwas])
+    }, [item.mid, fetchSavedManhwas])
 
-    const handleLog = async () => {
+    const handleLog = useCallback(async () => {
         try {
             await log(item.mid, number);
-            onChangeNumber('')
             showMessage({
                 message: "Chapter Changed!",
                 description: `Your chapter has been changed to ${number}`,
@@ -81,34 +80,37 @@ export default React.memo(function ManhwaCardSaved({ item }) {
                 duration: 2000, // Duration in milliseconds
                 position: 'bottom'
             });
-            refreshManhwas()
+            onChangeNumber('')
+            fetchSavedManhwas()
         } catch (err) {
             console.error(err)
         }
-    }
+    }, [item.mid, fetchSavedManhwas, number])
 
     return (
         <View style={styles.itemContainer}>
-            <View style={[styles.item, styles.titleContainer]}>
-                <Text style={styles.title}>{item.title}</Text>
-            </View>
             <View style={styles.item}>
                 <Image style={styles.logo} source={{ uri: `https://manhwasaver.com/manhwaImages/${item.mid}.webp` }} />
-                <View style={styles.itemInner}>
-                    <Text style={styles.label}>Status: </Text>
-                    <Text style={styles.misc}>{item.status} {item.status == 'Ongoing' ? <View style={{ backgroundColor: 'green', borderRadius: 50, width: 10, height: 10, }} /> : null}
-                    </Text>
-                    <Text style={styles.label}>Updated: </Text>
-                    <Text style={styles.misc}>{new Date(item.lastUpdate).toLocaleString('nl-NL', {
-                        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-                    }).slice(0,
-                        -3)}</Text>
-                </View>
-                <View style={styles.itemInner}>
-                    <Text style={styles.label}>Chapters: </Text>
-                    <Text style={styles.misc}>{item.chapter % 1 === 0 ? item.chapter : item.chapter.toFixed(1)} | {item.chapters % 1 === 0 ? item.chapters : item.chapters.toFixed(1)}</Text>
-                    <Text style={styles.label}>Source: </Text>
-                    <Text style={styles.misc}>{item.baseurl.split('/')[2].split('.')[0]}</Text>
+                <View style={styles.itemOuter}>
+                    <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
+                    <View style={styles.item}>
+                        <View style={styles.itemInner}>
+                            <Text style={styles.label}>Status: </Text>
+                            <Text style={styles.misc}>{item.status} {item.status == 'Ongoing' ? <View style={{ backgroundColor: 'green', borderRadius: 50, width: 10, height: 10, }} /> : null}
+                            </Text>
+                            <Text style={styles.label}>Updated: </Text>
+                            <Text style={styles.misc}>{new Date(item.lastUpdate).toLocaleString('nl-NL', {
+                                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                            }).slice(0,
+                                -3)}</Text>
+                        </View>
+                        <View style={styles.itemInner}>
+                            <Text style={styles.label}>Chapters: </Text>
+                            <Text style={styles.misc}>{item.chapter % 1 === 0 ? item.chapter : item.chapter.toFixed(1)} | {item.chapters % 1 === 0 ? item.chapters : item.chapters.toFixed(1)}</Text>
+                            <Text style={styles.label}>Source: </Text>
+                            <Text style={styles.misc}>{item.baseurl.split('/')[2].split('.')[0]}</Text>
+                        </View>
+                    </View>
                 </View>
             </View>
 
@@ -174,12 +176,17 @@ const styles = StyleSheet.create({
     genre: {
         color: '#e0e0e0',
     },
+    itemOuter: {
+        backgroundColor: '#1e1e1e',
+        marginVertical: 8,
+        alignItems: 'center',
+    },
     itemInner: {
         backgroundColor: '#1e1e1e',
         flexDirection: 'column',
-        flex: 1,
         alignItems: 'center',
         marginVertical: 8,
+        marginHorizontal: 16,
     },
     item: {
         backgroundColor: '#1e1e1e',
@@ -195,8 +202,12 @@ const styles = StyleSheet.create({
         width: 265
     },
     title: {
-        fontSize: 32,
+        fontSize: 18,
+        textDecorationLine: 'underline',
+        textAlign: 'center',
         color: 'white',
+        height: 20,
+        width: 200
     },
     content: {
         color: 'white'
@@ -221,7 +232,7 @@ const styles = StyleSheet.create({
     button: {
         paddingVertical: 10,
         paddingHorizontal: 15,
-        backgroundColor: 'midnightblue',  // Blue background color
+        backgroundColor: '#0d6efd',  // Blue background color
         borderRadius: 5,
         marginHorizontal: 5,
         flex: 1,
@@ -235,10 +246,10 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     remove: {
-        backgroundColor: 'maroon'
+        backgroundColor: '#ab2532'
     },
     later: {
-        backgroundColor: 'darkgoldenrod',
+        backgroundColor: '#e67e00',
         color: '#c1c1c1'
     },
     next: {

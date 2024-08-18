@@ -4,6 +4,17 @@ import { useAuth } from './AuthContext';
 
 const ManhwaContext = createContext();
 
+function markSavedManhwas(manhwaArray, savedManhwas) {
+    const savedMids = new Set(savedManhwas.map(manhwa => manhwa.mid));
+
+    return manhwaArray.map(manhwa => {
+        if (savedMids.has(manhwa.mid)) {
+            return { ...manhwa, saved: true };
+        }
+        return manhwa;
+    });
+}
+
 export const ManhwaProvider = ({ children }) => {
     const scrollRef = useRef();
     const [savedManhwas, setSavedManhwas] = useState([]);
@@ -17,16 +28,21 @@ export const ManhwaProvider = ({ children }) => {
     const [totalPagesLatest, setTotalPagesLatest] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
 
-    const fetchSavedManhwas = useCallback(async () => {
-        if (!authState.userId) {
+
+    const fetchSavedManhwas = useCallback(async (refresh = false) => {
+        if (authState === null && authState.userId == null) {
             return;
         }
-        const threshold = 100; // Define a threshold time (in milliseconds)
+        const threshold = 200; // Define a threshold time (in milliseconds)
         const startTime = performance.now(); // Start the timer
-
-        const loadingTimeout = setTimeout(() => {
+        let loadingTimeout;
+        if (refresh)
             setIsLoading(true);
-        }, threshold);
+        else {
+            loadingTimeout = setTimeout(() => {
+                setIsLoading(true);
+            }, threshold);
+        }
         // setIsLoading(true);
         try {
             const response = await fetch(`https://manhwasaver.com/auth/api/savedmanhwas`, {
@@ -48,23 +64,33 @@ export const ManhwaProvider = ({ children }) => {
             console.error('Error fetching manhwas:', error);
         } finally {
             clearTimeout(loadingTimeout); // Prevent the loading screen from showing
-            setIsLoading(false)
+            if (refresh)
+                setTimeout(() => { setIsLoading(false) }, 1500)
         }
     }, [authState.userId]);
 
-    const fetchAllManhwas = useCallback(async (page = 1) => {
-        const threshold = 100; // Define a threshold time (in milliseconds)
+    const fetchAllManhwas = useCallback(async (page = 1, refresh = false) => {
+        const threshold = 200; // Define a threshold time (in milliseconds)
         const startTime = performance.now(); // Start the timer
-
-        const loadingTimeout = setTimeout(() => {
+        let loadingTimeout;
+        if (refresh)
             setIsLoading(true);
-        }, threshold);
+        else {
+            loadingTimeout = setTimeout(() => {
+                setIsLoading(true);
+            }, threshold);
+        }
         // setIsLoading(true);
         try {
             const response = await fetch(`https://manhwasaver.com/api/manhwas/${page}`);
             const data = await response.json();
             setTotalpages(response.headers.get('totalpages'));
-            setAllManhwas(data);
+            if (authState !== null && authState.userId !== null && savedManhwas && savedManhwas.length > 0) {
+                const manhwas = markSavedManhwas(data, savedManhwas);
+                setAllManhwas(manhwas);
+            } else {
+                setAllManhwas(data);
+            }
             const endTime = performance.now(); // End the timer
             const timeTaken = endTime - startTime;
 
@@ -76,37 +102,56 @@ export const ManhwaProvider = ({ children }) => {
             console.error('Error fetching all manhwas:', error);
         } finally {
             clearTimeout(loadingTimeout); // Prevent the loading screen from showing
-            setIsLoading(false)
+            if (refresh)
+                setTimeout(() => { setIsLoading(false) }, 1500)
+
         }
-    }, []);
+    }, [authState.userId]);
 
     const fetchAllManhwasTotal = useCallback(async () => {
         setIsLoading(true);
         try {
             const response = await fetch(`https://manhwasaver.com/json/manhwas.json`);
             const data = await response.json();
-            setAllManhwasTotal(data);
+
+            if (authState !== null && authState.userId != null && savedManhwas && savedManhwas.length > 0) {
+                const manhwas = markSavedManhwas(data, savedManhwas);
+                setAllManhwasTotal(manhwas);
+            } else {
+                setAllManhwasTotal(data);
+            }
         } catch (error) {
             console.error('Error fetching all manhwas:', error);
         } finally {
             setIsLoading(false)
         }
-    }, []);
+    }, [authState.userId]);
 
-    const fetchLatest = useCallback(async (page = 1) => {
+    const fetchLatest = useCallback(async (refresh = false) => {
 
-        const threshold = 100; // Define a threshold time (in milliseconds)
+        const threshold = 200; // Define a threshold time (in milliseconds)
         const startTime = performance.now(); // Start the timer
-
-        const loadingTimeout = setTimeout(() => {
+        let loadingTimeout;
+        if (refresh)
             setIsLoading(true);
-        }, threshold);
+        else {
+            loadingTimeout = setTimeout(() => {
+                setIsLoading(true);
+            }, threshold);
+        }
         // setIsLoading(true);
         try {
             const response = await fetch(`https://manhwasaver.com/api/latest`);
             const data = await response.json();
             setTotalPagesLatest(Math.ceil(data.length / 10));
-            setLatestManhwas(data);
+
+            if (authState !== null && authState.userId != null && savedManhwas && savedManhwas.length > 0) {
+                const manhwas = markSavedManhwas(data, savedManhwas);
+                setLatestManhwas(manhwas);
+            } else {
+                setLatestManhwas(data);
+            }
+
             const endTime = performance.now(); // End the timer
             const timeTaken = endTime - startTime;
 
@@ -118,9 +163,10 @@ export const ManhwaProvider = ({ children }) => {
             console.error('Error fetching all manhwas:', error);
         } finally {
             clearTimeout(loadingTimeout); // Prevent the loading screen from showing
-            setIsLoading(false)
+            if (refresh)
+                setTimeout(() => { setIsLoading(false) }, 1500)
         }
-    }, []);
+    }, [authState.userId, markSavedManhwas]);
 
     useEffect((page) => {
         if (authState.userId)

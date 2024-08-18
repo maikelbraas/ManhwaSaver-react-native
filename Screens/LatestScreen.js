@@ -14,7 +14,7 @@ export default React.memo(function LatestScreen() {
         { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     )
     const card = ({ item }) => (<ManhwaCard item={item} />);
-    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={fetchLatest} />;
+    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => { fetchLatest(true) }} />;
     const keyExtractor = item => item.mid;
 
     const handlePageClick = useCallback((p) => {
@@ -32,9 +32,9 @@ export default React.memo(function LatestScreen() {
                 keyExtractor={keyExtractor}
                 initialNumToRender={3}
                 renderItem={card}
-                windowSize={3}
+                // windowSize={3}
                 ref={scrollRef}
-                removeClippedSubviews={true}
+                // removeClippedSubviews={true}
                 getItemLayout={getItemLayout}
                 refreshControl={refreshControl} />
             <View style={styles.paginationContainer}>

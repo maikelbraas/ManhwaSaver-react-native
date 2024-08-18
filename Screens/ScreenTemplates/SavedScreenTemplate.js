@@ -17,7 +17,7 @@ export default React.memo(function SavedScreenTemplate({ filterFunction, categor
     );
 
     const card = ({ item }) => (<ManhwaCardSaved item={item} />);
-    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={fetchSavedManhwas} />;
+    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => { fetchSavedManhwas(true) }} />;
     const keyExtractor = item => item.mid;
 
     const filteredManhwas = useMemo(() => {

@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
         const checkAuth = async () => {
             try {
                 const storedAuth = { isAuthenticated: await AsyncStorage.getItem('isAuthenticated'), id: await AsyncStorage.getItem('userId') };
+
                 if (storedAuth.isAuthenticated === 'true' && storedAuth.id != 'undefined') {
                     // Verify the stored authentication with the server
                     const serverAuth = await checkLoginStatus();

@@ -25,10 +25,11 @@ export const login = async (username, password) => {
 
 export const logout = async () => {
     try {
-        await fetch(`${API_URL_AUTH}/logout`, {
+        const response = await fetch(`${API_URL_AUTH}/logout`, {
             method: 'GET',
             credentials: 'include',
         });
+        await response.json();
         return true;
     } catch (error) {
         console.error('Logout failed:', error);

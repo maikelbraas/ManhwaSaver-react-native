@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 
 export default function ManhwaCard({ item }) {
-    const { refreshManhwas } = useManhwas();
+    const { fetchAllManhwas, currentPage } = useManhwas();
     const [isExpanded, setIsExpanded] = useState(false);
     const [contentHeight, setContentHeight] = useState(0);
 
@@ -35,7 +35,7 @@ export default function ManhwaCard({ item }) {
                             duration: 2000, // Duration in milliseconds
                             position: 'bottom'
                         });
-                        refreshManhwas();
+                        fetchAllManhwas(currentPage);
                     }
                 },
             ])
@@ -45,20 +45,17 @@ export default function ManhwaCard({ item }) {
     }
     return (
         <View style={styles.itemContainer}>
-            <View style={[styles.item, styles.titleContainer]}>
-                <Text style={styles.title}>{item.title}</Text>
-            </View>
-
             <View style={styles.item}>
                 <Image style={styles.logo} source={{ uri: `https://manhwasaver.com/manhwaImages/${item.mid}.webp` }} />
                 <View style={[
                     styles.itemScroll,
-                    { height: isExpanded ? 'auto' : 225 }, // Set to a fixed height when not expanded
+                    { height: isExpanded ? 'auto' : 210 }, // Set to a fixed height when not expanded
                 ]}
                     onLayout={(event) => {
                         const { height } = event.nativeEvent.layout;
                         setContentHeight(height); // Capture the height of the content
                     }}>
+                    <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
                     <TouchableOpacity onPress={toggleExpand}>
                         <Text style={styles.content}>{decodeHtmlCharCodes(item.content)}</Text>
                     </TouchableOpacity>
@@ -139,16 +136,19 @@ const styles = StyleSheet.create({
     itemScroll: {
         indicatorStyle: 'white',
         paddingHorizontal: 4,
-        height: 225,
-        flex: 1,
-        flexWrap: 'wrap'
+        height: 210,
+        flexDirection: 'column'
     },
     title: {
-        fontSize: 32,
+        fontSize: 18,
+        textDecorationLine: 'underline',
         color: 'white',
+        height: 20,
+        width: 210
     },
     content: {
         color: 'white',
+        width: 210
     },
     misc: {
         color: 'white',

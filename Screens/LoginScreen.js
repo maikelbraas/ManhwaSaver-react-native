@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from '../Components/InputStyle'
 import * as Keychain from "react-native-keychain"
-import CustomLoadingScreen from '../Components/CustomLoadingScreen';
 
 
 const retrieveCredentials = async () => {
@@ -46,7 +45,10 @@ const LoginScreen = () => {
                 Alert.alert('Use saved credentials', `Do you want to use your saved credentials?`, [
                     {
                         text: 'Cancel',
-                        onPress: () => { },
+                        onPress: () => {
+                            setUsername('')
+                            setPassword('')
+                        },
                         style: 'cancel',
                     },
                     {
@@ -65,8 +67,7 @@ const LoginScreen = () => {
         if (data.success) {
             await AsyncStorage.setItem('userId', `${data.user.id}`);
             await login();
-            if (!await Keychain.getGenericPassword())
-                saveCredentials(username, password)
+            saveCredentials(username, password)
             navigation.navigate('Saved Manhwas Ongoing');
         } else {
             Alert.alert('Login Failed', 'Please check your credentials and try again.');
