@@ -17,6 +17,7 @@ export const ManhwaProvider = ({ children }) => {
     const [totalPagesLatest, setTotalPagesLatest] = useState(0);
     const [currentPageAll, setCurrentPageAll] = useState(1);
     const [currentPageLatest, setCurrentPageLatest] = useState(1);
+    const [currentPageSaved, setCurrentPageSaved] = useState(1);
 
     const fetchSavedManhwas = useCallback(async (refresh = false) => {
         if (!authState || !authState.userId) {
@@ -173,9 +174,11 @@ export const ManhwaProvider = ({ children }) => {
             fetchSavedManhwas,
             currentPageAll,
             currentPageLatest,
+            currentPageSaved,
             totalPages,
             setCurrentPageAll,
             setCurrentPageLatest,
+            setCurrentPageSaved,
             totalPagesSaved,
             totalPagesLatest,
             allManhwasTotal,

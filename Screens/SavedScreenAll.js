@@ -11,33 +11,38 @@ import CustomLoadingScreen from '../Components/CustomLoadingScreen';
 export default React.memo(function SavedScreenAll() {
     const ITEM_HEIGHT = 480;
     const scrollRef = useRef();
-    const { savedManhwas, isLoading, refreshManhwas, currentPage, totalPagesSaved } = useManhwas();
+    const { savedManhwas, isLoading, fetchSavedManhwas, currentPageSaved, setCurrentPageSaved, totalPagesSaved } = useManhwas();
     const getItemLayout = (data, index) => (
         { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     )
     const card = ({ item }) => (<ManhwaCardSaved item={item} />);
-    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={refreshManhwas} />;
+    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => fetchSavedManhwas(true)} />;
     const keyExtractor = item => item.mid;
 
+    const handlePageClick = useCallback((p) => {
+        fetchSavedManhwas()
+        setCurrentPageSaved(p);
+        scrollRef.current.scrollToOffset({ y: 0, animated: true });
+    }, [setCurrentPageSaved]);
 
     return (
         <Suspense fallback={<CustomLoadingScreen />}>
             <SafeAreaView style={styles.container}>
                 <FlatList keyboardShouldPersistTaps='handled'
-                    data={savedManhwas.slice((currentPage - 1) * 10, currentPage * 10)}
+                    data={savedManhwas.slice((currentPageSaved - 1) * 10, currentPageSaved * 10)}
                     keyExtractor={keyExtractor}
                     initialNumToRender={3}
                     renderItem={card}
-                    windowSize={3}
+                    // windowSize={3}
                     ref={scrollRef}
-                    removeClippedSubviews={true}
+                    // removeClippedSubviews={true}
                     getItemLayout={getItemLayout}
                     refreshControl={refreshControl} />
                 <View style={styles.paginationContainer}>
                     <Pagination
                         handlePageClick={handlePageClick}
                         totalPages={totalPagesSaved}
-                        currentPage={currentPage} />
+                        currentPage={currentPageSaved} />
                 </View>
             </SafeAreaView>
         </Suspense>
