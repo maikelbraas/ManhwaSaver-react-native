@@ -5,24 +5,44 @@ import Pagination from '../Components/Pagination';
 import { RefreshControl } from 'react-native-gesture-handler';
 import { useManhwas } from '../Components/ManhwaContext';
 import CustomLoadingScreen from '../Components/CustomLoadingScreen';
+import { useAuth } from '../Components/AuthContext';
 
 export default React.memo(function HomeScreen() {
     const ITEM_HEIGHT = 480;
     const scrollRef = useRef();
-    const { allManhwas, isLoading, fetchAllManhwas, currentPage, totalPages, setCurrentPage } = useManhwas();
+    const { allManhwas, isLoading, fetchAllManhwas, currentPageAll, totalPages, setCurrentPageAll, savedManhwas } = useManhwas();
+    const { authState } = useAuth();
     const getItemLayout = (data, index) => (
         { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     )
+
     const card = useCallback(({ item }) => (<ManhwaCard item={item} />), []);
-    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => { setCurrentPage(1); fetchAllManhwas(1, true) }} />;
+    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => { setCurrentPageAll(1); fetchAllManhwas(1, true) }} />;
     const keyExtractor = item => item.mid;
 
     const handlePageClick = useCallback((p) => {
         fetchAllManhwas(p)
-        setCurrentPage(p);
+        setCurrentPageAll(p);
         scrollRef.current.scrollToOffset({ y: 0, animated: true });
-    }, [setCurrentPage]);
+    }, [setCurrentPageAll]);
 
+
+
+    function markSavedManhwas(manhwaArray, savedManhwas) {
+        const savedMids = new Set(savedManhwas.map(manhwa => manhwa.mid));
+
+        return manhwaArray.map(manhwa => ({
+            ...manhwa,
+            saved: savedMids.has(manhwa.mid)
+        }));
+    }
+
+    let allManhwasFiltered;
+    if (authState.isAuthenticated) {
+        allManhwasFiltered = markSavedManhwas(allManhwas, savedManhwas);
+    } else {
+        allManhwasFiltered = allManhwas
+    }
     if (isLoading || allManhwas.length === 0) {
         return <CustomLoadingScreen text='Loading manhwas...' />;
     }
@@ -30,7 +50,7 @@ export default React.memo(function HomeScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <FlatList keyboardShouldPersistTaps='handled'
-                data={allManhwas}
+                data={allManhwasFiltered}
                 keyExtractor={keyExtractor}
                 initialNumToRender={3}
                 renderItem={card}
@@ -43,7 +63,7 @@ export default React.memo(function HomeScreen() {
                 <Pagination
                     handlePageClick={handlePageClick}
                     totalPages={totalPages}
-                    currentPage={currentPage} />
+                    currentPage={currentPageAll} />
             </View>
         </SafeAreaView>
     )

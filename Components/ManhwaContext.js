@@ -4,17 +4,6 @@ import { useAuth } from './AuthContext';
 
 const ManhwaContext = createContext();
 
-function markSavedManhwas(manhwaArray, savedManhwas) {
-    const savedMids = new Set(savedManhwas.map(manhwa => manhwa.mid));
-
-    return manhwaArray.map(manhwa => {
-        if (savedMids.has(manhwa.mid)) {
-            return { ...manhwa, saved: true };
-        }
-        return manhwa;
-    });
-}
-
 export const ManhwaProvider = ({ children }) => {
     const scrollRef = useRef();
     const [savedManhwas, setSavedManhwas] = useState([]);
@@ -26,14 +15,15 @@ export const ManhwaProvider = ({ children }) => {
     const [totalPages, setTotalpages] = useState(0);
     const [totalPagesSaved, setTotalPagesSaved] = useState(0);
     const [totalPagesLatest, setTotalPagesLatest] = useState(0);
-    const [currentPage, setCurrentPage] = useState(1);
-
+    const [currentPageAll, setCurrentPageAll] = useState(1);
+    const [currentPageLatest, setCurrentPageLatest] = useState(1);
 
     const fetchSavedManhwas = useCallback(async (refresh = false) => {
-        if (authState === null && authState.userId == null) {
+        if (!authState || !authState.userId) {
             return;
         }
-        const threshold = 200; // Define a threshold time (in milliseconds)
+
+        const threshold = 300; // Define a threshold time (in milliseconds)
         const startTime = performance.now(); // Start the timer
         let loadingTimeout;
         if (refresh)
@@ -57,22 +47,25 @@ export const ManhwaProvider = ({ children }) => {
             const timeTaken = endTime - startTime;
 
 
-            if (timeTaken < threshold) {
+            if (timeTaken < threshold && loadingTimeout != undefined) {
                 clearTimeout(loadingTimeout); // Prevent the loading screen from showing
             }
         } catch (error) {
-            console.error('Error fetching manhwas:', error);
+            console.error('Error fetching all manhwas:', error);
         } finally {
-            clearTimeout(loadingTimeout); // Prevent the loading screen from showing
+            if (loadingTimeout != undefined)
+                clearTimeout(loadingTimeout); // Prevent the loading screen from showing
             if (refresh)
                 setTimeout(() => { setIsLoading(false) }, 1500)
         }
-    }, [authState.userId]);
+    }, [authState]);
 
     const fetchAllManhwas = useCallback(async (page = 1, refresh = false) => {
+
         const threshold = 200; // Define a threshold time (in milliseconds)
         const startTime = performance.now(); // Start the timer
         let loadingTimeout;
+
         if (refresh)
             setIsLoading(true);
         else {
@@ -85,23 +78,20 @@ export const ManhwaProvider = ({ children }) => {
             const response = await fetch(`https://manhwasaver.com/api/manhwas/${page}`);
             const data = await response.json();
             setTotalpages(response.headers.get('totalpages'));
-            if (authState !== null && authState.userId !== null && savedManhwas && savedManhwas.length > 0) {
-                const manhwas = markSavedManhwas(data, savedManhwas);
-                setAllManhwas(manhwas);
-            } else {
-                setAllManhwas(data);
-            }
+            setAllManhwas(data);
+
             const endTime = performance.now(); // End the timer
             const timeTaken = endTime - startTime;
 
 
-            if (timeTaken < threshold) {
+            if (timeTaken < threshold && loadingTimeout != undefined) {
                 clearTimeout(loadingTimeout); // Prevent the loading screen from showing
             }
         } catch (error) {
             console.error('Error fetching all manhwas:', error);
         } finally {
-            clearTimeout(loadingTimeout); // Prevent the loading screen from showing
+            if (loadingTimeout != undefined)
+                clearTimeout(loadingTimeout); // Prevent the loading screen from showing
             if (refresh)
                 setTimeout(() => { setIsLoading(false) }, 1500)
 
@@ -114,12 +104,8 @@ export const ManhwaProvider = ({ children }) => {
             const response = await fetch(`https://manhwasaver.com/json/manhwas.json`);
             const data = await response.json();
 
-            if (authState !== null && authState.userId != null && savedManhwas && savedManhwas.length > 0) {
-                const manhwas = markSavedManhwas(data, savedManhwas);
-                setAllManhwasTotal(manhwas);
-            } else {
-                setAllManhwasTotal(data);
-            }
+            setAllManhwasTotal(data);
+
         } catch (error) {
             console.error('Error fetching all manhwas:', error);
         } finally {
@@ -145,47 +131,38 @@ export const ManhwaProvider = ({ children }) => {
             const data = await response.json();
             setTotalPagesLatest(Math.ceil(data.length / 10));
 
-            if (authState !== null && authState.userId != null && savedManhwas && savedManhwas.length > 0) {
-                const manhwas = markSavedManhwas(data, savedManhwas);
-                setLatestManhwas(manhwas);
-            } else {
-                setLatestManhwas(data);
-            }
+            setLatestManhwas(data);
 
             const endTime = performance.now(); // End the timer
             const timeTaken = endTime - startTime;
 
-
-            if (timeTaken < threshold) {
+            if (timeTaken < threshold && loadingTimeout != undefined) {
                 clearTimeout(loadingTimeout); // Prevent the loading screen from showing
             }
         } catch (error) {
             console.error('Error fetching all manhwas:', error);
         } finally {
-            clearTimeout(loadingTimeout); // Prevent the loading screen from showing
+            if (loadingTimeout != undefined)
+                clearTimeout(loadingTimeout); // Prevent the loading screen from showing
             if (refresh)
                 setTimeout(() => { setIsLoading(false) }, 1500)
         }
-    }, [authState.userId, markSavedManhwas]);
+    }, [authState.userId]);
 
     useEffect((page) => {
-        if (authState.userId)
-            fetchSavedManhwas();
-        fetchAllManhwas(page);
-        fetchLatest();
-        fetchAllManhwasTotal();
-    }, [authState.userId, fetchSavedManhwas, fetchAllManhwas]);
 
-    const setPage = useCallback((page) => {
-        if (authState.userId) {
-            fetchSavedManhwas();
-            setCurrentPage(page);
+        if (authState.isAuthenticated) {
+            fetchSavedManhwas().then(() => {
+                fetchAllManhwas(page);
+                fetchLatest();
+                fetchAllManhwasTotal();
+            });
+        } else {
+            fetchAllManhwas(page);
+            fetchLatest();
+            fetchAllManhwasTotal();
         }
-        fetchLatest();
-        setCurrentPage(page);
-        fetchAllManhwas(page);
-        fetchAllManhwasTotal();
-    }, [fetchAllManhwas, fetchSavedManhwas]);
+    }, [authState.userId, fetchSavedManhwas, fetchAllManhwas]);
 
     return (
         <ManhwaContext.Provider value={{
@@ -194,10 +171,11 @@ export const ManhwaProvider = ({ children }) => {
             latestManhwas,
             isLoading,
             fetchSavedManhwas,
-            setPage,
-            currentPage,
+            currentPageAll,
+            currentPageLatest,
             totalPages,
-            setCurrentPage,
+            setCurrentPageAll,
+            setCurrentPageLatest,
             totalPagesSaved,
             totalPagesLatest,
             allManhwasTotal,

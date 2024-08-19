@@ -16,6 +16,8 @@
 		7A25631F650B7CCF9D422D58 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D2AA86B0BD53C1F419FE8853 /* PrivacyInfo.xcprivacy */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		FF4461EA2C6FF09C0055229E /* splash_screen.png in Resources */ = {isa = PBXBuildFile; fileRef = FF4461E92C6FF09C0055229E /* splash_screen.png */; };
+		FF71D32B2C729D6A00EFB320 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = FFCC65DF2C72930600DC37F0 /* main.jsbundle */; };
+		FFA7A7DE2C72A55800AB4C7F /* assets in Resources */ = {isa = PBXBuildFile; fileRef = FFA7A7DD2C72A55800AB4C7F /* assets */; };
 		FFE39A652C6BC46D00D83A7E /* android-chrome-192x192.png in Resources */ = {isa = PBXBuildFile; fileRef = FFE39A642C6BC46D00D83A7E /* android-chrome-192x192.png */; };
 		FFE39A7A2C6BCC8500D83A7E /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FFE39A662C6BCC8500D83A7E /* AntDesign.ttf */; };
 		FFE39A7B2C6BCC8500D83A7E /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FFE39A672C6BCC8500D83A7E /* Entypo.ttf */; };
@@ -69,6 +71,10 @@
 		D2AA86B0BD53C1F419FE8853 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = refactorTest/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FF4461E92C6FF09C0055229E /* splash_screen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = splash_screen.png; path = refactorTest/Images.xcassets/splash_screen.png; sourceTree = "<group>"; };
+		FFA7A7D92C72A34200AB4C7F /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo.png; path = assets/logo.png; sourceTree = SOURCE_ROOT; };
+		FFA7A7DB2C72A3E000AB4C7F /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo.png; path = assets/assets/logo.png; sourceTree = "<group>"; };
+		FFA7A7DD2C72A55800AB4C7F /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
+		FFCC65DF2C72930600DC37F0 /* main.jsbundle */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		FFE39A642C6BC46D00D83A7E /* android-chrome-192x192.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "android-chrome-192x192.png"; path = "refactorTest/android-chrome-192x192.png"; sourceTree = "<group>"; };
 		FFE39A662C6BCC8500D83A7E /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AntDesign.ttf; sourceTree = "<group>"; };
 		FFE39A672C6BCC8500D83A7E /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Entypo.ttf; sourceTree = "<group>"; };
@@ -166,6 +172,9 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				FFA7A7DD2C72A55800AB4C7F /* assets */,
+				FFA7A7DB2C72A3E000AB4C7F /* logo.png */,
+				FFCC65DF2C72930600DC37F0 /* main.jsbundle */,
 				13B07FAE1A68108700A75B9A /* refactorTest */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* refactorTestTests */,
@@ -201,6 +210,7 @@
 		FFE39A792C6BCC8500D83A7E /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
+				FFA7A7D92C72A34200AB4C7F /* logo.png */,
 				FFE39A662C6BCC8500D83A7E /* AntDesign.ttf */,
 				FFE39A672C6BCC8500D83A7E /* Entypo.ttf */,
 				FFE39A682C6BCC8500D83A7E /* EvilIcons.ttf */,
@@ -318,6 +328,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FFA7A7DE2C72A55800AB4C7F /* assets in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				FFE39A7B2C6BCC8500D83A7E /* Entypo.ttf in Resources */,
 				FFE39A872C6BCC8500D83A7E /* Ionicons.ttf in Resources */,
@@ -330,6 +341,7 @@
 				FFE39A7E2C6BCC8500D83A7E /* FontAwesome.ttf in Resources */,
 				FFE39A8A2C6BCC8500D83A7E /* Octicons.ttf in Resources */,
 				7A25631F650B7CCF9D422D58 /* PrivacyInfo.xcprivacy in Resources */,
+				FF71D32B2C729D6A00EFB320 /* main.jsbundle in Resources */,
 				FFE39A7D2C6BCC8500D83A7E /* Feather.ttf in Resources */,
 				FFE39A892C6BCC8500D83A7E /* MaterialIcons.ttf in Resources */,
 				FF4461EA2C6FF09C0055229E /* splash_screen.png in Resources */,
@@ -693,9 +705,13 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				USE_HERMES = true;
 			};
 			name = Debug;
@@ -765,7 +781,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

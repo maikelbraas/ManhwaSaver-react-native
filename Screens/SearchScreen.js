@@ -2,12 +2,14 @@ import React, { useState, useCallback, useRef, Suspense } from 'react';
 import { View, TextInput, FlatList, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { useManhwas } from '../Components/ManhwaContext';
 import ManhwaCard from '../Components/ManhwaCard';
+import { useAuth } from '../Components/AuthContext';
 
 const SearchScreen = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const { allManhwasTotal } = useManhwas();
+    const { allManhwasTotal, savedManhwas } = useManhwas();
+    const { authState } = useAuth();
     const debounceTimeout = useRef(null);
 
     const performSearch = useCallback((query) => {
@@ -33,6 +35,21 @@ const SearchScreen = () => {
         }
     };
 
+    function markSavedManhwas(manhwaArray, savedManhwas) {
+        const savedMids = new Set(savedManhwas.map(manhwa => manhwa.mid));
+
+        return manhwaArray.map(manhwa => ({
+            ...manhwa,
+            saved: savedMids.has(manhwa.mid)
+        }));
+    }
+
+    let searchResultsFiltered;
+    if (authState.isAuthenticated) {
+        searchResultsFiltered = markSavedManhwas(searchResults, savedManhwas);
+    } else {
+        searchResultsFiltered = searchResults
+    }
     const renderItem = ({ item }) => <ManhwaCard item={item} />;
 
     return (
@@ -49,7 +66,7 @@ const SearchScreen = () => {
                 <ActivityIndicator size="large" color="#007bff" />
             ) : (
                 <FlatList
-                    data={searchResults}
+                    data={searchResultsFiltered}
                     renderItem={renderItem}
                     keyExtractor={item => item.mid}
                     ListEmptyComponent={() => (

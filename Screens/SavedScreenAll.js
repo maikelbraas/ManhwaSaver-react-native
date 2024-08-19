@@ -11,17 +11,14 @@ import CustomLoadingScreen from '../Components/CustomLoadingScreen';
 export default React.memo(function SavedScreenAll() {
     const ITEM_HEIGHT = 480;
     const scrollRef = useRef();
-    const { savedManhwas, isLoading, refreshManhwas, currentPage, totalPagesSaved, setPage } = useManhwas();
+    const { savedManhwas, isLoading, refreshManhwas, currentPage, totalPagesSaved } = useManhwas();
     const getItemLayout = (data, index) => (
         { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     )
     const card = ({ item }) => (<ManhwaCardSaved item={item} />);
     const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={refreshManhwas} />;
     const keyExtractor = item => item.mid;
-    const handlePageClick = useCallback((p) => {
-        setPage(p);
-        scrollRef.current.scrollToOffset({ y: 0, animated: false });
-    }, [setPage]);
+
 
     return (
         <Suspense fallback={<CustomLoadingScreen />}>

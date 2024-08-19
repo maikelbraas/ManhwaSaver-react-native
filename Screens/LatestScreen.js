@@ -5,11 +5,14 @@ import Pagination from '../Components/Pagination';
 import { RefreshControl } from 'react-native-gesture-handler';
 import { useManhwas } from '../Components/ManhwaContext';
 import CustomLoadingScreen from '../Components/CustomLoadingScreen';
+import { useAuth } from '../Components/AuthContext';
+
 
 export default React.memo(function LatestScreen() {
     const ITEM_HEIGHT = 480;
     const scrollRef = useRef();
-    const { latestManhwas, isLoading, fetchLatest, currentPage, totalPagesLatest, setPage } = useManhwas();
+    const { latestManhwas, isLoading, fetchLatest, currentPageLatest, totalPagesLatest, setCurrentPageLatest, savedManhwas } = useManhwas();
+    const { authState } = useAuth();
     const getItemLayout = (data, index) => (
         { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     )
@@ -18,17 +21,33 @@ export default React.memo(function LatestScreen() {
     const keyExtractor = item => item.mid;
 
     const handlePageClick = useCallback((p) => {
-        setPage(p);
-        scrollRef.current.scrollToOffset({ y: 0, animated: true });
-    }, [setPage]);
+        fetchLatest();
+        setCurrentPageLatest(p);
+    }, [setCurrentPageLatest, fetchLatest]);
 
+
+    function markSavedManhwas(manhwaArray, savedManhwas) {
+        const savedMids = new Set(savedManhwas.map(manhwa => manhwa.mid));
+
+        return manhwaArray.map(manhwa => ({
+            ...manhwa,
+            saved: savedMids.has(manhwa.mid)
+        }));
+    }
+
+    let latestManhwasFiltered;
+    if (authState.isAuthenticated) {
+        latestManhwasFiltered = markSavedManhwas(latestManhwas, savedManhwas);
+    } else {
+        latestManhwasFiltered = latestManhwas
+    }
     if (isLoading || latestManhwas.length === 0) {
         return <CustomLoadingScreen text='Loading manhwas...' />;
     }
     return (
         <SafeAreaView style={styles.container}>
             <FlatList keyboardShouldPersistTaps='handled'
-                data={latestManhwas.slice((currentPage - 1) * 10, currentPage * 10)}
+                data={latestManhwasFiltered.slice((currentPageLatest - 1) * 10, currentPageLatest * 10)}
                 keyExtractor={keyExtractor}
                 initialNumToRender={3}
                 renderItem={card}
@@ -41,7 +60,7 @@ export default React.memo(function LatestScreen() {
                 <Pagination
                     handlePageClick={handlePageClick}
                     totalPages={totalPagesLatest}
-                    currentPage={currentPage} />
+                    currentPage={currentPageLatest} />
             </View>
         </SafeAreaView>
     )

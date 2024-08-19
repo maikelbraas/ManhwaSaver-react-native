@@ -5,12 +5,14 @@ import { useManhwas } from '../Components/ManhwaContext';
 import { decodeHtmlCharCodes } from './Utils';
 import { showMessage } from 'react-native-flash-message';
 import { useState } from 'react';
+import { useAuth } from './AuthContext';
 
 
 export default function ManhwaCard({ item }) {
     const { fetchAllManhwas, currentPage } = useManhwas();
     const [isExpanded, setIsExpanded] = useState(false);
     const [contentHeight, setContentHeight] = useState(0);
+    const { authState } = useAuth();
 
     const toggleExpand = () => {
         setIsExpanded(!isExpanded);
@@ -43,6 +45,9 @@ export default function ManhwaCard({ item }) {
             console.error(err)
         }
     }
+
+
+
     return (
         <View style={styles.itemContainer}>
             <View style={styles.item}>
@@ -93,7 +98,7 @@ export default function ManhwaCard({ item }) {
                 <Text style={styles.misc}>{item.baseurl.split('/')[2].split('.')[0]}</Text>
             </View>
             {
-                item.saved == undefined ? <TouchableOpacity style={{ ...stylesButton.button, ...styles.try }} data={item} onPress={handlerTry}>
+                !item.saved ? <TouchableOpacity style={{ ...stylesButton.button, ...styles.try }} data={item} onPress={handlerTry}>
                     <Text style={styles.buttonText}> Try </Text>
                 </TouchableOpacity> : ''
             }

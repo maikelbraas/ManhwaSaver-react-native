@@ -18,10 +18,10 @@ const SavedScreenUpToDate = lazy(() => import('./Screens/SavedScreenUpToDate'));
 const LatestScreen = lazy(() => import('./Screens/LatestScreen'));
 const LoginScreen = lazy(() => import('./Screens/LoginScreen'));
 const SearchScreen = lazy(() => import('./Screens/SearchScreen'));
-const SavedScreenOngoing = lazy(() => import('./Screens/SavedScreenOngoing'));
+// const SavedScreenOngoing = lazy(() => import('./Screens/SavedScreenOngoing'));
 
 import HomeScreen from './Screens/HomeScreen';
-// import SavedScreenOngoing from './Screens/SavedScreenOngoing';
+import SavedScreenOngoing from './Screens/SavedScreenOngoing';
 //Old load all on app load
 // import SavedScreenAll from './Screens/SavedScreenAll';
 // import SavedScreenHiatus from './Screens/SavedScreenHiatus';
@@ -50,11 +50,11 @@ const LazyScreenWrapper = ({ component: Component, ...props }) => {
     // }
 
     // return <Component {...props} />
-    return (<Component {...props} />
+    return (
+        <Suspense fallback={<CustomLoadingScreen text='Loading manhwas...' />}>
+            <Component {...props} />
+        </Suspense>
     )
-    // <Suspense fallback={<CustomLoadingScreen text='Loading manhwas...' />}>
-
-    // </Suspense>
 };
 
 // Create components for each lazy-loaded screen
@@ -67,7 +67,7 @@ const LazySavedScreenUpToDate = (props) => <LazyScreenWrapper component={SavedSc
 const LazyLatestScreen = (props) => <LazyScreenWrapper component={LatestScreen} {...props} />;
 const LazyLoginScreen = (props) => <LazyScreenWrapper component={LoginScreen} {...props} />;
 const LazySearchScreen = (props) => <LazyScreenWrapper component={SearchScreen} {...props} />;
-const LazySavedScreenOngoing = (props) => <LazyScreenWrapper component={SavedScreenOngoing} {...props} />;
+// const LazySavedScreenOngoing = (props) => <LazyScreenWrapper component={SavedScreenOngoing} {...props} />;
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -115,7 +115,7 @@ const StackNav = () => {
         <View style={{ flex: 1, height: "100%", width: "100%" }} collapsable={false}>
             <Stack.Navigator screenOptions={screenOptionsStack} initialRouteName={authState.isAuthenticated ? 'Saved Manhwas Ongoing' : 'Home'}>
                 <Stack.Screen name="Home" component={HomeScreen} />
-                <Stack.Screen name="Saved Manhwas Ongoing" component={LazySavedScreenOngoing} options={{ title: 'Saved Manhwas Ongoing' }} />
+                <Stack.Screen name="Saved Manhwas Ongoing" component={SavedScreenOngoing} options={{ title: 'Saved Manhwas Ongoing' }} />
 
                 <Stack.Screen name="Search" component={LazySearchScreen} options={{ title: 'Latest Manhwas' }} />
                 <Stack.Screen name="Latest" component={LazyLatestScreen} options={{ title: 'Latest Manhwas' }} />

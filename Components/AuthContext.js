@@ -2,7 +2,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isLoggedIn as checkLoginStatus } from './AuthLogic'; // Import your auth functions
-
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
@@ -24,13 +23,19 @@ export const AuthProvider = ({ children }) => {
                     const serverAuth = await checkLoginStatus();
                     if (!serverAuth.isAuthenticated)
                         return false;
-                    setAuthState(prevState => ({
-                        ...prevState,
+                    setAuthState({
                         isAuthenticated: serverAuth.isAuthenticated,
                         userId: parseInt(serverAuth.user.id),
                         isLoading: false
-                    }));
+                    });
                     await AsyncStorage.setItem('userId', `${serverAuth.user.id}`);
+                } else {
+                    await AsyncStorage.clear();
+                    setAuthState({
+                        isAuthenticated: false,
+                        userId: null,
+                        isLoading: false
+                    });
                 }
             } catch (error) {
                 console.error('Error checking authentication:', error);
@@ -46,12 +51,11 @@ export const AuthProvider = ({ children }) => {
 
     const login = async () => {
         const id = await AsyncStorage.getItem('userId');
-        setAuthState(prevState => ({
-            ...prevState,
+        setAuthState({
             isAuthenticated: true,
             userId: parseInt(id),
             isLoading: false
-        }));
+        });
         await AsyncStorage.setItem('isAuthenticated', 'true');
     };
 
