@@ -19,6 +19,7 @@ export const ManhwaProvider = ({ children }) => {
     const [currentPageLatest, setCurrentPageLatest] = useState(1);
     const [currentPageSaved, setCurrentPageSaved] = useState(1);
 
+
     const fetchSavedManhwas = useCallback(async (refresh = false) => {
         if (!authState || !authState.userId) {
             return;
@@ -42,20 +43,34 @@ export const ManhwaProvider = ({ children }) => {
                 credentials: 'include',
             });
             const data = await response.json();
+
+            // Categorize manhwas
+            const categorizedManhwas = data.map(manhwa => {
+                for (const { filter, category } of filterFunctions) {
+                    if (filter(manhwa)) {
+                        manhwa.category = category;
+                        break; // Stop once the manhwa is categorized
+                    }
+                }
+                return manhwa;
+            });
             setTotalPagesSaved(Math.ceil(data.length / 10));
-            setSavedManhwas(data);
+            setSavedManhwas(categorizedManhwas);
             const endTime = performance.now(); // End the timer
             const timeTaken = endTime - startTime;
 
 
             if (timeTaken < threshold && loadingTimeout != undefined) {
                 clearTimeout(loadingTimeout); // Prevent the loading screen from showing
+                setIsLoading(false);
             }
         } catch (error) {
             console.error('Error fetching all manhwas:', error);
         } finally {
-            if (loadingTimeout != undefined)
+            if (loadingTimeout != undefined) {
                 clearTimeout(loadingTimeout); // Prevent the loading screen from showing
+                setIsLoading(false);
+            }
             if (refresh)
                 setTimeout(() => { setIsLoading(false) }, 1500)
         }
@@ -87,12 +102,15 @@ export const ManhwaProvider = ({ children }) => {
 
             if (timeTaken < threshold && loadingTimeout != undefined) {
                 clearTimeout(loadingTimeout); // Prevent the loading screen from showing
+                setIsLoading(false);
             }
         } catch (error) {
             console.error('Error fetching all manhwas:', error);
         } finally {
-            if (loadingTimeout != undefined)
+            if (loadingTimeout != undefined) {
                 clearTimeout(loadingTimeout); // Prevent the loading screen from showing
+                setIsLoading(false);
+            }
             if (refresh)
                 setTimeout(() => { setIsLoading(false) }, 1500)
 
@@ -143,8 +161,10 @@ export const ManhwaProvider = ({ children }) => {
         } catch (error) {
             console.error('Error fetching all manhwas:', error);
         } finally {
-            if (loadingTimeout != undefined)
+            if (loadingTimeout != undefined) {
                 clearTimeout(loadingTimeout); // Prevent the loading screen from showing
+                setIsLoading(false);
+            }
             if (refresh)
                 setTimeout(() => { setIsLoading(false) }, 1500)
         }
@@ -195,3 +215,31 @@ export const ManhwaProvider = ({ children }) => {
 };
 
 export const useManhwas = () => useContext(ManhwaContext);
+
+// Define filter functions with their respective categories
+const filterFunctions = [
+    {
+        filter: manhwa => manhwa.status.trim().toLowerCase() === 'hiatus' && manhwa.reading === 0 && (manhwa.category === undefined || manhwa.category === 'hiatus'),
+        category: 'Hiatus'
+    },
+    {
+        filter: manhwa => manhwa.reading === 0 && manhwa.chapter.toFixed(1) === manhwa.chapters.toFixed(1) && manhwa.status.trim().toLowerCase() === 'completed' && (manhwa.category === undefined || manhwa.category === 'completed'),
+        category: 'Completed'
+    },
+    {
+        filter: manhwa => manhwa.reading === 1,
+        category: 'Later'
+    },
+    {
+        filter: manhwa => manhwa.chapter > 1 && manhwa.reading === 0 && manhwa.chapter.toFixed(1) !== manhwa.chapters.toFixed(1) && (manhwa.category === undefined || manhwa.category === 'ongoing'),
+        category: 'Ongoing'
+    },
+    {
+        filter: manhwa => manhwa.reading === 0 && manhwa.chapter === 1 && (manhwa.category === undefined || manhwa.category === 'try'),
+        category: 'Try'
+    },
+    {
+        filter: manhwa => manhwa.reading === 0 && manhwa.chapter.toFixed(1) === manhwa.chapters.toFixed(1) && manhwa.status.trim().toLowerCase() !== 'hiatus' && (manhwa.category === undefined || manhwa.category === 'uptodate'),
+        category: 'UpToDate'
+    }
+];

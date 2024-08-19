@@ -1,35 +1,64 @@
-import { FlatList, SafeAreaView, StyleSheet } from 'react-native';
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import { FlatList, SafeAreaView, StyleSheet, View } from 'react-native';
+import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import ManhwaCardSaved from '../../Components/ManhwaCardSaved';
 import { RefreshControl } from 'react-native-gesture-handler';
 import { useManhwas } from '../../Components/ManhwaContext';
 import CustomLoadingScreen from '../../Components/CustomLoadingScreen';
 
-const ITEM_HEIGHT = 480;
-
-export default React.memo(function SavedScreenTemplate({ filterFunction, categoryName }) {
-
-    const scrollRef = useRef();
+export default React.memo(function SavedScreenTemplate({ route }) {
+    const flatListRef = useRef();
     const { savedManhwas, isLoading, fetchSavedManhwas } = useManhwas();
+    const [itemHeights, setItemHeights] = useState({});
+    const [isReadyToScroll, setIsReadyToScroll] = useState(false);
 
-    const getItemLayout = (data, index) => (
-        { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
-    );
-
-    const card = ({ item }) => (<ManhwaCardSaved item={item} />);
-    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => { fetchSavedManhwas(true) }} />;
-    const keyExtractor = item => item.mid;
 
     const filteredManhwas = useMemo(() => {
         return savedManhwas.filter(manhwa => {
-            if (filterFunction(manhwa)) {
-                manhwa.category = categoryName;
+            if (route.name.includes(manhwa.category))
                 return manhwa;
-            }
         });
-    }, [savedManhwas, filterFunction, categoryName])
+    }, [savedManhwas])
+    const targetIndex = useMemo(() => {
+        if (route.params?.mid) {
+            return filteredManhwas.findIndex(manhwa => manhwa.mid === route.params.mid);
+        }
+        return -1;
+    }, [route.params?.mid, filteredManhwas]);
 
-    if (isLoading || filteredManhwas.length === 0) {
+    useEffect(() => {
+        if (isReadyToScroll && targetIndex !== -1 && flatListRef.current) {
+            flatListRef.current.scrollToIndex({ index: targetIndex, animated: false });
+        }
+    }, [isReadyToScroll, targetIndex]);
+
+    const onItemLayout = useCallback((event, mid) => {
+        const { height } = event.nativeEvent.layout;
+        setItemHeights(prevHeights => {
+            const newHeights = { ...prevHeights, [mid]: height };
+            // Check if all items have been measured
+            if (Object.keys(newHeights).length === filteredManhwas.length) {
+                setIsReadyToScroll(true);
+            }
+            return newHeights;
+        });
+    }, [filteredManhwas.length]);
+
+    const getItemLayout = (data, index) => ({
+        length: itemHeights[data[index].mid] || 0,
+        offset: Object.values(itemHeights).slice(0, index).reduce((sum, height) => sum + height, 0),
+        index,
+    });
+
+    const renderItem = ({ item }) => (
+        <View onLayout={event => onItemLayout(event, item.mid)}>
+            <ManhwaCardSaved item={item} />
+        </View>
+    );
+
+    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => { fetchSavedManhwas(true) }} />;
+    const keyExtractor = item => item.mid;
+
+    if (isLoading || savedManhwas.length === 0) {
         return <CustomLoadingScreen text='Loading manhwas...' />;
     }
 
@@ -38,13 +67,13 @@ export default React.memo(function SavedScreenTemplate({ filterFunction, categor
             <FlatList
                 keyboardShouldPersistTaps='handled'
                 data={filteredManhwas}
-                keyExtractor={keyExtractor}
-                initialNumToRender={3}
-                renderItem={card}
-                // windowSize={3}
-                ref={scrollRef}
-                // removeClippedSubviews={true}
                 getItemLayout={getItemLayout}
+                keyExtractor={keyExtractor}
+                // initialNumToRender={3}
+                renderItem={renderItem}
+                // windowSize={3}
+                ref={flatListRef}
+                // removeClippedSubviews={true}
                 refreshControl={refreshControl}
             />
         </SafeAreaView>

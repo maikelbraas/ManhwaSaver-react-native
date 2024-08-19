@@ -1,22 +1,29 @@
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from 'react-native';
 import stylesButton from '../Components/InputStyle'
 import { tryManhwa } from './ManhwaHandel';
 import { useManhwas } from '../Components/ManhwaContext';
 import { decodeHtmlCharCodes } from './Utils';
 import { showMessage } from 'react-native-flash-message';
-import { useState } from 'react';
+import { useState } from 'react'
+import { useRoute } from '@react-navigation/native';
 import { useAuth } from './AuthContext';
 
 
-export default function ManhwaCard({ item }) {
-    const { fetchAllManhwas, currentPage } = useManhwas();
+export default function ManhwaCard({ item, navigation }) {
+    const { fetchAllManhwas, currentPageAll, fetchLatest, currentPageLatest } = useManhwas();
     const [isExpanded, setIsExpanded] = useState(false);
-    const [contentHeight, setContentHeight] = useState(0);
+    const route = useRoute();
     const { authState } = useAuth();
 
+    const [contentHeight, setContentHeight] = useState(0);
     const toggleExpand = () => {
         setIsExpanded(!isExpanded);
     };
+
+    const handleGoTo = async () => {
+        navigation.navigate('Saved Manhwas ' + item.category, { mid: item.mid })
+    }
+
     const handlerTry = async () => {
         try {
             Alert.alert('Try manhwa', `Are you sure you want to try manhwa\n${item.title}`, [
@@ -30,14 +37,17 @@ export default function ManhwaCard({ item }) {
                         await tryManhwa(item.mid);
                         showMessage({
                             message: "Manhwa try",
-                            description: `Manhwa ahs been added to try list.\n${item.title}`,
+                            description: `Manhwa has been added to try list.\n${item.title}`,
                             type: "success",
                             backgroundColor: "green", // Background color
                             color: "#e0e0e0", // Text color
                             duration: 2000, // Duration in milliseconds
                             position: 'bottom'
                         });
-                        fetchAllManhwas(currentPage);
+                        if (route.name == "Home")
+                            fetchAllManhwas(currentPageAll);
+                        else if (route.name == "Latest")
+                            fetchLatest(currentPageLatest);
                     }
                 },
             ])
@@ -98,8 +108,10 @@ export default function ManhwaCard({ item }) {
                 <Text style={styles.misc}>{item.baseurl.split('/')[2].split('.')[0]}</Text>
             </View>
             {
-                !item.saved ? <TouchableOpacity style={{ ...stylesButton.button, ...styles.try }} data={item} onPress={handlerTry}>
+                authState.isAuthenticated == true ? !item.saved ? <TouchableOpacity style={{ ...stylesButton.button, ...styles.try }} data={item} onPress={handlerTry}>
                     <Text style={styles.buttonText}> Try </Text>
+                </TouchableOpacity> : <TouchableOpacity style={{ ...stylesButton.button, ...styles.go }} data={item} onPress={handleGoTo}>
+                    <Text style={styles.buttonText}> Go to manhwa </Text>
                 </TouchableOpacity> : ''
             }
         </View >
@@ -167,7 +179,10 @@ const styles = StyleSheet.create({
         width: 150
     },
     try: {
-        backgroundColor: 'green'
+        backgroundColor: '#198754'
+    },
+    go: {
+        backgroundColor: '#0a5fdd'
     },
     indicate: {
         fontSize: 18,

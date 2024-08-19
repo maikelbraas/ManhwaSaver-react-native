@@ -8,7 +8,7 @@ import CustomLoadingScreen from '../Components/CustomLoadingScreen';
 import { useAuth } from '../Components/AuthContext';
 
 
-export default React.memo(function LatestScreen() {
+export default React.memo(function LatestScreen({ navigation }) {
     const ITEM_HEIGHT = 480;
     const scrollRef = useRef();
     const { latestManhwas, isLoading, fetchLatest, currentPageLatest, totalPagesLatest, setCurrentPageLatest, savedManhwas } = useManhwas();
@@ -16,7 +16,7 @@ export default React.memo(function LatestScreen() {
     const getItemLayout = (data, index) => (
         { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     )
-    const card = ({ item }) => (<ManhwaCard item={item} />);
+    const card = useCallback(({ item }) => (<ManhwaCard item={item} navigation={navigation} />), []);
     const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => { fetchLatest(true) }} />;
     const keyExtractor = item => item.mid;
 
@@ -27,12 +27,19 @@ export default React.memo(function LatestScreen() {
 
 
     function markSavedManhwas(manhwaArray, savedManhwas) {
-        const savedMids = new Set(savedManhwas.map(manhwa => manhwa.mid));
+        // Create a map of saved manhwas with their `mid` as the key
+        const savedManhwasMap = new Map(savedManhwas.map(manhwa => [manhwa.mid, manhwa]));
 
-        return manhwaArray.map(manhwa => ({
-            ...manhwa,
-            saved: savedMids.has(manhwa.mid)
-        }));
+        return manhwaArray.map(manhwa => {
+            const savedManhwa = savedManhwasMap.get(manhwa.mid);
+
+            // If the manhwa is saved, mark it as saved and copy the category
+            return {
+                ...manhwa,
+                saved: !!savedManhwa,
+                category: savedManhwa ? savedManhwa.category : undefined
+            };
+        });
     }
 
     let latestManhwasFiltered;

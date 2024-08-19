@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, TextInput, Linking, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, Keyboard, TouchableOpacity, TextInput, Linking, Alert } from 'react-native';
 import React, { useCallback, useState } from 'react';
 import stylesInput from '../Components/InputStyle'
 import { remove, later, log } from './ManhwaHandel';
@@ -70,18 +70,32 @@ export default React.memo(function ManhwaCardSaved({ item }) {
 
     const handleLog = useCallback(async () => {
         try {
-            await log(item.mid, number);
-            showMessage({
-                message: "Chapter Changed!",
-                description: `Your chapter has been changed to ${number}`,
-                type: "info",
-                backgroundColor: "green", // Background color
-                color: "#e0e0e0", // Text color
-                duration: 2000, // Duration in milliseconds
-                position: 'bottom'
-            });
-            onChangeNumber('')
-            fetchSavedManhwas()
+            if (number > item.chapters || number < 1) {
+                showMessage({
+                    message: "Chapter change failed.",
+                    description: `${number} not allowed. Keep it within the limit.`,
+                    type: "warning",
+                    backgroundColor: "#ab2532", // Background color
+                    color: "#e0e0e0", // Text color
+                    duration: 2000, // Duration in milliseconds
+                    position: 'bottom'
+                });
+                onChangeNumber('')
+            } else {
+                await log(item.mid, number);
+                showMessage({
+                    message: "Chapter Changed!",
+                    description: `Your chapter has been changed to ${number}`,
+                    type: "info",
+                    backgroundColor: "green", // Background color
+                    color: "#e0e0e0", // Text color
+                    duration: 2000, // Duration in milliseconds
+                    position: 'bottom'
+                });
+                onChangeNumber('')
+                fetchSavedManhwas()
+            }
+            Keyboard.dismiss();
         } catch (err) {
             console.error(err)
         }

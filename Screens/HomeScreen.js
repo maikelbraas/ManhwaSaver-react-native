@@ -7,7 +7,7 @@ import { useManhwas } from '../Components/ManhwaContext';
 import CustomLoadingScreen from '../Components/CustomLoadingScreen';
 import { useAuth } from '../Components/AuthContext';
 
-export default React.memo(function HomeScreen() {
+export default React.memo(function HomeScreen({ navigation }) {
     const ITEM_HEIGHT = 480;
     const scrollRef = useRef();
     const { allManhwas, isLoading, fetchAllManhwas, currentPageAll, totalPages, setCurrentPageAll, savedManhwas } = useManhwas();
@@ -15,26 +15,31 @@ export default React.memo(function HomeScreen() {
     const getItemLayout = (data, index) => (
         { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     )
-
-    const card = useCallback(({ item }) => (<ManhwaCard item={item} />), []);
-    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => { setCurrentPageAll(1); fetchAllManhwas(1, true) }} />;
+    const card = useCallback(({ item }) => (<ManhwaCard item={item} navigation={navigation} />), []);
+    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => { fetchAllManhwas(1, true) }} />;
     const keyExtractor = item => item.mid;
 
     const handlePageClick = useCallback((p) => {
-        fetchAllManhwas(p)
+        fetchAllManhwas(p, false)
         setCurrentPageAll(p);
         scrollRef.current.scrollToOffset({ y: 0, animated: true });
     }, [setCurrentPageAll]);
 
 
-
     function markSavedManhwas(manhwaArray, savedManhwas) {
-        const savedMids = new Set(savedManhwas.map(manhwa => manhwa.mid));
+        // Create a map of saved manhwas with their `mid` as the key
+        const savedManhwasMap = new Map(savedManhwas.map(manhwa => [manhwa.mid, manhwa]));
 
-        return manhwaArray.map(manhwa => ({
-            ...manhwa,
-            saved: savedMids.has(manhwa.mid)
-        }));
+        return manhwaArray.map(manhwa => {
+            const savedManhwa = savedManhwasMap.get(manhwa.mid);
+
+            // If the manhwa is saved, mark it as saved and copy the category
+            return {
+                ...manhwa,
+                saved: !!savedManhwa,
+                category: savedManhwa ? savedManhwa.category : undefined
+            };
+        });
     }
 
     let allManhwasFiltered;

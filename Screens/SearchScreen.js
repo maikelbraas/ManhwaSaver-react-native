@@ -4,7 +4,7 @@ import { useManhwas } from '../Components/ManhwaContext';
 import ManhwaCard from '../Components/ManhwaCard';
 import { useAuth } from '../Components/AuthContext';
 
-const SearchScreen = () => {
+const SearchScreen = ({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -29,19 +29,26 @@ const SearchScreen = () => {
         if (text.length > 2) {
             debounceTimeout.current = setTimeout(() => {
                 performSearch(text);
-            }, 300); // 300ms delay
+            }, 1); // 300ms delay
         } else {
             setSearchResults([]);
         }
     };
 
     function markSavedManhwas(manhwaArray, savedManhwas) {
-        const savedMids = new Set(savedManhwas.map(manhwa => manhwa.mid));
+        // Create a map of saved manhwas with their `mid` as the key
+        const savedManhwasMap = new Map(savedManhwas.map(manhwa => [manhwa.mid, manhwa]));
 
-        return manhwaArray.map(manhwa => ({
-            ...manhwa,
-            saved: savedMids.has(manhwa.mid)
-        }));
+        return manhwaArray.map(manhwa => {
+            const savedManhwa = savedManhwasMap.get(manhwa.mid);
+
+            // If the manhwa is saved, mark it as saved and copy the category
+            return {
+                ...manhwa,
+                saved: !!savedManhwa,
+                category: savedManhwa ? savedManhwa.category : undefined
+            };
+        });
     }
 
     let searchResultsFiltered;
@@ -50,7 +57,7 @@ const SearchScreen = () => {
     } else {
         searchResultsFiltered = searchResults
     }
-    const renderItem = ({ item }) => <ManhwaCard item={item} />;
+    const card = useCallback(({ item }) => (<ManhwaCard item={item} navigation={navigation} />), []);
 
     return (
 
@@ -66,8 +73,9 @@ const SearchScreen = () => {
                 <ActivityIndicator size="large" color="#007bff" />
             ) : (
                 <FlatList
+                    keyboardShouldPersistTaps='handled'
                     data={searchResultsFiltered}
-                    renderItem={renderItem}
+                    renderItem={card}
                     keyExtractor={item => item.mid}
                     ListEmptyComponent={() => (
                         <View style={styles.emptyContainer}>
