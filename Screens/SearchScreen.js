@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useRef, Suspense } from 'react';
-import { View, TextInput, FlatList, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import React, { useState, useCallback, useRef } from 'react';
+import { View, TextInput, FlatList, StyleSheet, ActivityIndicator, Text, SafeAreaView } from 'react-native';
 import { useManhwas } from '../Components/ManhwaContext';
 import ManhwaCard from '../Components/ManhwaCard';
 import { useAuth } from '../Components/AuthContext';
@@ -13,12 +13,10 @@ const SearchScreen = ({ navigation }) => {
     const debounceTimeout = useRef(null);
 
     const performSearch = useCallback((query) => {
-        setIsLoading(true);
         const filteredResults = allManhwasTotal.filter(manhwa =>
             manhwa.title.toLowerCase().includes(query.toLowerCase())
         );
         setSearchResults(filteredResults);
-        setIsLoading(false);
     }, [allManhwasTotal]);
 
     const handleSearch = (text) => {
@@ -27,22 +25,22 @@ const SearchScreen = ({ navigation }) => {
             clearTimeout(debounceTimeout.current);
         }
         if (text.length > 2) {
+            setIsLoading(true);
             debounceTimeout.current = setTimeout(() => {
                 performSearch(text);
-            }, 1); // 300ms delay
+                setIsLoading(false);
+            }, 100);
         } else {
             setSearchResults([]);
         }
     };
 
     function markSavedManhwas(manhwaArray, savedManhwas) {
-        // Create a map of saved manhwas with their `mid` as the key
         const savedManhwasMap = new Map(savedManhwas.map(manhwa => [manhwa.mid, manhwa]));
 
         return manhwaArray.map(manhwa => {
             const savedManhwa = savedManhwasMap.get(manhwa.mid);
 
-            // If the manhwa is saved, mark it as saved and copy the category
             return {
                 ...manhwa,
                 saved: !!savedManhwa,
@@ -60,8 +58,7 @@ const SearchScreen = ({ navigation }) => {
     const card = useCallback(({ item }) => (<ManhwaCard item={item} navigation={navigation} />), []);
 
     return (
-
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <TextInput
                 style={styles.searchInput}
                 placeholder="Search manhwas..."
@@ -86,7 +83,7 @@ const SearchScreen = ({ navigation }) => {
                     )}
                 />
             )}
-        </View>
+        </SafeAreaView>
     );
 };
 

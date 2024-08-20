@@ -6,8 +6,9 @@ import { RefreshControl } from 'react-native-gesture-handler';
 import { useManhwas } from '../Components/ManhwaContext';
 import CustomLoadingScreen from '../Components/CustomLoadingScreen';
 import { useAuth } from '../Components/AuthContext';
+import { showMessage } from 'react-native-flash-message';
 
-export default React.memo(function HomeScreen({ navigation }) {
+export default React.memo(function HomeScreen({ navigation, route }) {
     const ITEM_HEIGHT = 480;
     const scrollRef = useRef();
     const { allManhwas, isLoading, fetchAllManhwas, currentPageAll, totalPages, setCurrentPageAll, savedManhwas } = useManhwas();
@@ -15,6 +16,25 @@ export default React.memo(function HomeScreen({ navigation }) {
     const getItemLayout = (data, index) => (
         { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     )
+
+    useEffect(() => {
+        if (route.params != undefined) {
+            if (route.params.forceLogout != undefined && route.params.forceLogout)
+                showMessage({
+                    message: "Logged out.",
+                    description: `You where logout from the server. Log back in to visit saved pages.`,
+                    type: "warning",
+                    backgroundColor: "#ab2532", // Background color
+                    color: "#e0e0e0", // Text color
+                    duration: 2000, // Duration in milliseconds
+                    position: 'top'
+                });
+        }
+
+        // Reset the parameter
+        navigation.setParams({ forceLogout: undefined });
+    }, [route.params?.forceLogout]);
+
     const card = useCallback(({ item }) => (<ManhwaCard item={item} navigation={navigation} />), []);
     const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => { fetchAllManhwas(1, true) }} />;
     const keyExtractor = item => item.mid;

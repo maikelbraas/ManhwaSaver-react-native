@@ -5,10 +5,13 @@ import { remove, later, log } from './ManhwaHandel';
 import { decodeHtmlCharCodes } from './Utils';
 import { useManhwas } from '../Components/ManhwaContext';
 import { showMessage } from 'react-native-flash-message';
+import { useAuth } from './AuthContext';
+import { isLoggedIn } from './AuthLogic';
 
-export default React.memo(function ManhwaCardSaved({ item }) {
+export default React.memo(function ManhwaCardSaved({ item, navigation }) {
     const [number, onChangeNumber] = useState('');
     const { fetchSavedManhwas } = useManhwas();
+    const { logout } = useAuth();
 
     const confirmRemove = useCallback(() => {
         Alert.alert('Remove Manhwa', `Are you sure you want to remove:\n${item.title}`, [
@@ -33,73 +36,91 @@ export default React.memo(function ManhwaCardSaved({ item }) {
     }, [item.title, handleLater]);
 
     const handleRemove = useCallback(async () => {
+        const check = await isLoggedIn();
+        if (!check.isAuthenticated) {
+            await logout();
+            navigation.navigate('Home', { forceLogout: true });
+            return;
+        }
         try {
             await remove(item.mid);
             showMessage({
                 message: "Manhwa removed.",
-                description: `Your manhwa \n${item.title}\nhas been removed from saved.`,
+                description: `Your manhwa:\n${item.title}\nhas been removed from saved.`,
                 type: "info",
                 backgroundColor: "maroon", // Background color
                 color: "#e0e0e0", // Text color
                 duration: 2000, // Duration in milliseconds
-                position: 'bottom'
+                position: 'top'
             });
-            fetchSavedManhwas()
+            fetchSavedManhwas(false, navigation)
         } catch (err) {
             console.error(err)
         }
-    }, [item.mid, fetchSavedManhwas])
+    }, [item.mid, fetchSavedManhwas, navigation, logout, isLoggedIn])
 
     const handleLater = useCallback(async () => {
+        const check = await isLoggedIn();
+        if (!check.isAuthenticated) {
+            await logout();
+            navigation.navigate('Home', { forceLogout: true });
+            return;
+        }
         try {
             await later(item.mid);
             showMessage({
                 message: `Manhwa ${item.reading == 0 ? 'Later' : 'Read'}`,
-                description: `Manhwa has been moved to ${item.reading == 0 ? 'Later' : 'Read'} \n${item.title}`,
+                description: `Manhwa has been moved to ${item.reading == 0 ? 'Later' : 'Read'}\n${item.title}`,
                 type: "info",
                 backgroundColor: `${item.reading == 0 ? 'orange' : 'green'}`, // Background color
                 color: "#e0e0e0", // Text color
                 duration: 2000, // Duration in milliseconds
-                position: 'bottom'
+                position: 'top'
             });
-            fetchSavedManhwas()
+            fetchSavedManhwas(false, navigation)
         } catch (err) {
             console.error(err)
         }
-    }, [item.mid, fetchSavedManhwas])
+    }, [item.mid, fetchSavedManhwas, navigation, logout, isLoggedIn])
 
     const handleLog = useCallback(async () => {
+        const check = await isLoggedIn();
+        if (!check.isAuthenticated) {
+            await logout();
+            navigation.navigate('Home', { forceLogout: true });
+            return;
+        }
         try {
             if (number > item.chapters || number < 1) {
                 showMessage({
                     message: "Chapter change failed.",
-                    description: `${number} not allowed. Keep it within the limit.`,
+                    description: `${number} is not allowed.\nKeep it within the limit.\nMin: 1, Max: ${item.chapters}`,
                     type: "warning",
                     backgroundColor: "#ab2532", // Background color
                     color: "#e0e0e0", // Text color
                     duration: 2000, // Duration in milliseconds
-                    position: 'bottom'
+                    position: 'top'
                 });
                 onChangeNumber('')
             } else {
                 await log(item.mid, number);
                 showMessage({
                     message: "Chapter Changed!",
-                    description: `Your chapter has been changed to ${number}`,
+                    description: `That chapter of\n${item.title}\nhas changed to ${number}.`,
                     type: "info",
                     backgroundColor: "green", // Background color
                     color: "#e0e0e0", // Text color
                     duration: 2000, // Duration in milliseconds
-                    position: 'bottom'
+                    position: 'top'
                 });
                 onChangeNumber('')
-                fetchSavedManhwas()
+                fetchSavedManhwas(false, navigation)
             }
             Keyboard.dismiss();
         } catch (err) {
             console.error(err)
         }
-    }, [item.mid, fetchSavedManhwas, number])
+    }, [item.mid, fetchSavedManhwas, number, navigation, logout, isLoggedIn])
 
     return (
         <View style={styles.itemContainer}>
@@ -128,7 +149,7 @@ export default React.memo(function ManhwaCardSaved({ item }) {
                 </View>
             </View>
 
-            {item.category != 'later' ?
+            {item.category != 'Later' && item.category != 'Hiatus' ?
                 <View style={styles.buttonItem}>
                     <TextInput
                         style={[stylesInput.input, styles.inputSize]}
@@ -151,7 +172,7 @@ export default React.memo(function ManhwaCardSaved({ item }) {
                         <Text style={styles.buttonText}>{item.reading == 0 ? 'Later' : 'Read'}</Text>
                     </TouchableOpacity>
                 </View>
-                {item.category != 'later' ?
+                {item.category != 'Later' && item.category != 'UpToDate' ?
                     <View style={styles.buttonItem}>
                         <TouchableOpacity style={styles.button} data={item} onPress={async () => { await Linking.openURL(item.link) }}>
                             <Text style={styles.buttonText}>Current</Text>
@@ -168,6 +189,7 @@ export default React.memo(function ManhwaCardSaved({ item }) {
 const styles = StyleSheet.create({
 
     itemContainer: {
+        flex: 1,
         backgroundColor: '#1e1e1e',
         marginBottom: 20,
     },
@@ -249,9 +271,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#0d6efd',  // Blue background color
         borderRadius: 5,
         marginHorizontal: 5,
-        flex: 1,
         borderWidth: 1,
-        borderColor: 'black'
+        borderColor: 'black',
+        flex: 1
     },
     buttonText: {
         color: '#fff',  // White text color

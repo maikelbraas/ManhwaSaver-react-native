@@ -7,13 +7,14 @@ import { showMessage } from 'react-native-flash-message';
 import { useState } from 'react'
 import { useRoute } from '@react-navigation/native';
 import { useAuth } from './AuthContext';
+import { isLoggedIn } from './AuthLogic';
 
 
 export default function ManhwaCard({ item, navigation }) {
     const { fetchAllManhwas, currentPageAll, fetchLatest, currentPageLatest } = useManhwas();
     const [isExpanded, setIsExpanded] = useState(false);
     const route = useRoute();
-    const { authState } = useAuth();
+    const { authState, logout } = useAuth();
 
     const [contentHeight, setContentHeight] = useState(0);
     const toggleExpand = () => {
@@ -21,10 +22,22 @@ export default function ManhwaCard({ item, navigation }) {
     };
 
     const handleGoTo = async () => {
+        const check = await isLoggedIn();
+        if (!check.isAuthenticated) {
+            await logout();
+            navigation.navigate('Home', { forceLogout: true });
+            return;
+        }
         navigation.navigate('Saved Manhwas ' + item.category, { mid: item.mid })
     }
 
     const handlerTry = async () => {
+        const check = await isLoggedIn();
+        if (!check.isAuthenticated) {
+            await logout();
+            navigation.navigate('Home', { forceLogout: true });
+            return;
+        }
         try {
             Alert.alert('Try manhwa', `Are you sure you want to try manhwa\n${item.title}`, [
                 {
@@ -42,7 +55,7 @@ export default function ManhwaCard({ item, navigation }) {
                             backgroundColor: "green", // Background color
                             color: "#e0e0e0", // Text color
                             duration: 2000, // Duration in milliseconds
-                            position: 'bottom'
+                            position: 'top'
                         });
                         if (route.name == "Home")
                             fetchAllManhwas(currentPageAll);

@@ -8,7 +8,7 @@ import CustomLoadingScreen from '../Components/CustomLoadingScreen';
 
 
 
-export default React.memo(function SavedScreenAll() {
+export default React.memo(function SavedScreenAll({ navigation }) {
     const ITEM_HEIGHT = 480;
     const scrollRef = useRef();
     const { savedManhwas, isLoading, fetchSavedManhwas, currentPageSaved, setCurrentPageSaved, totalPagesSaved } = useManhwas();
@@ -16,7 +16,7 @@ export default React.memo(function SavedScreenAll() {
         { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     )
     const card = ({ item }) => (<ManhwaCardSaved item={item} />);
-    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => fetchSavedManhwas(true)} />;
+    const refreshControl = <RefreshControl refreshing={isLoading} onRefresh={() => fetchSavedManhwas(true, navigation)} />;
     const keyExtractor = item => item.mid;
 
     const handlePageClick = useCallback((p) => {

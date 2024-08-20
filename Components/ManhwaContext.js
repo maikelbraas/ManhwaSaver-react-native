@@ -1,17 +1,18 @@
 // ManhwaContext.js
 import React, { createContext, useState, useContext, useCallback, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
+import { isLoggedIn } from './AuthLogic';
 
 const ManhwaContext = createContext();
 
-export const ManhwaProvider = ({ children }) => {
+export const ManhwaProvider = ({ children, navigation }) => {
     const scrollRef = useRef();
     const [savedManhwas, setSavedManhwas] = useState([]);
     const [allManhwas, setAllManhwas] = useState([]);
     const [allManhwasTotal, setAllManhwasTotal] = useState([]);
     const [latestManhwas, setLatestManhwas] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const { authState } = useAuth();
+    const { authState, logout } = useAuth();
     const [totalPages, setTotalpages] = useState(0);
     const [totalPagesSaved, setTotalPagesSaved] = useState(0);
     const [totalPagesLatest, setTotalPagesLatest] = useState(0);
@@ -20,8 +21,15 @@ export const ManhwaProvider = ({ children }) => {
     const [currentPageSaved, setCurrentPageSaved] = useState(1);
 
 
-    const fetchSavedManhwas = useCallback(async (refresh = false) => {
+    const fetchSavedManhwas = useCallback(async (refresh = false, navigation) => {
+        const check = await isLoggedIn();
+        if (!check.isAuthenticated) {
+            await logout();
+            navigation.navigate('Home', { forceLogout: true });
+            return;
+        }
         if (!authState || !authState.userId) {
+
             return;
         }
 
@@ -74,7 +82,7 @@ export const ManhwaProvider = ({ children }) => {
             if (refresh)
                 setTimeout(() => { setIsLoading(false) }, 1500)
         }
-    }, [authState]);
+    }, [authState, isLoggedIn]);
 
     const fetchAllManhwas = useCallback(async (page = 1, refresh = false) => {
 
@@ -173,7 +181,7 @@ export const ManhwaProvider = ({ children }) => {
     useEffect((page) => {
 
         if (authState.isAuthenticated) {
-            fetchSavedManhwas().then(() => {
+            fetchSavedManhwas(navigation).then(() => {
                 fetchAllManhwas(page);
                 fetchLatest();
                 fetchAllManhwasTotal();
