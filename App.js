@@ -38,18 +38,6 @@ import { ManhwaProvider } from './Components/ManhwaContext';
 import FlashMessage from "react-native-flash-message";
 
 const LazyScreenWrapper = ({ component: Component, ...props }) => {
-
-    // const [isReady, setIsReady] = useState(false);
-
-    // useEffect(() => {
-    //     setIsReady(true);
-    // }, []);
-
-    // if (!isReady) {
-    //     return <CustomLoadingScreen text="Loading manhwas..." />
-    // }
-
-    // return <Component {...props} />
     return (
         <Suspense fallback={<CustomLoadingScreen text='Loading manhwas...' />}>
             <Component {...props} />
