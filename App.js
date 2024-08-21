@@ -70,12 +70,12 @@ const LazyScreenWrapper = ({ component: Component, ...props }) => {
 };
 
 // Create components for each lazy-loaded screen
-const LazySavedScreenAll = (props) => <LazyScreenWrapper component={SavedScreenAll} {...props} />;
-const LazySavedScreenHiatus = (props) => <LazyScreenWrapper component={SavedScreenHiatus} {...props} />;
-const LazySavedScreenTry = (props) => <LazyScreenWrapper component={SavedScreenTry} {...props} />;
-const LazySavedScreenLater = (props) => <LazyScreenWrapper component={SavedScreenLater} {...props} />;
-const LazySavedScreenCompleted = (props) => <LazyScreenWrapper component={SavedScreenCompleted} {...props} />;
-const LazySavedScreenUpToDate = (props) => <LazyScreenWrapper component={SavedScreenUpToDate} {...props} />;
+const LazySavedScreenAll = (props) => <RouteWrapper component={() => <LazyScreenWrapper component={SavedScreenAll} {...props} />} />;
+const LazySavedScreenHiatus = (props) => <RouteWrapper component={() => <LazyScreenWrapper component={SavedScreenHiatus} {...props} />} />;
+const LazySavedScreenTry = (props) => <RouteWrapper component={() => <LazyScreenWrapper component={SavedScreenTry} {...props} />} />;
+const LazySavedScreenLater = (props) => <RouteWrapper component={() => <LazyScreenWrapper component={SavedScreenLater} {...props} />} />;
+const LazySavedScreenCompleted = (props) => <RouteWrapper component={() => <LazyScreenWrapper component={SavedScreenCompleted} {...props} />} />;
+const LazySavedScreenUpToDate = (props) => <RouteWrapper component={() => <LazyScreenWrapper component={SavedScreenUpToDate} {...props} />} />;
 const LazyLatestScreen = (props) => <LazyScreenWrapper component={LatestScreen} {...props} />;
 const LazyLoginScreen = (props) => <LazyScreenWrapper component={LoginScreen} {...props} />;
 const LazySearchScreen = (props) => <LazyScreenWrapper component={SearchScreen} {...props} />;
@@ -127,17 +127,17 @@ const StackNav = () => {
         <View style={{ flex: 1, height: "100%", width: "100%" }} collapsable={false}>
             <Stack.Navigator screenOptions={screenOptionsStack} initialRouteName={authState.isAuthenticated ? 'Saved Manhwas Ongoing' : 'Home'}>
                 <Stack.Screen name="Home" component={HomeScreen} />
-                <Stack.Screen name="Saved Manhwas Ongoing" component={(props) => <RouteWrapper component={SavedScreenOngoing} {...props} />} options={{ title: 'Saved Manhwas Ongoing' }} />
-
                 <Stack.Screen name="Search" component={LazySearchScreen} options={{ title: 'Latest Manhwas' }} />
                 <Stack.Screen name="Latest" component={LazyLatestScreen} options={{ title: 'Latest Manhwas' }} />
-                <Stack.Screen name="Saved Manhwas All" component={(props) => <RouteWrapper component={LazySavedScreenAll} {...props} />} options={{ title: 'Saved Manhwas All' }} />
-                <Stack.Screen name="Saved Manhwas Try" component={(props) => <RouteWrapper component={LazySavedScreenTry} {...props} />} options={{ title: 'Saved Manhwas Try' }} />
-                <Stack.Screen name="Saved Manhwas Later" component={(props) => <RouteWrapper component={LazySavedScreenLater} {...props} />} options={{ title: 'Saved Manhwas Later' }} />
-                <Stack.Screen name="Saved Manhwas Hiatus" component={(props) => <RouteWrapper component={LazySavedScreenHiatus} {...props} />} options={{ title: 'Saved Manhwas Hiatus' }} />
-                <Stack.Screen name="Saved Manhwas UpToDate" component={(props) => <RouteWrapper component={LazySavedScreenUpToDate} {...props} />} options={{ title: 'Saved Manhwas Up-To-Date' }} />
-                <Stack.Screen name="Saved Manhwas Completed" component={(props) => <RouteWrapper component={LazySavedScreenCompleted} {...props} />} options={{ title: 'Saved Manhwas Completed' }} />
-                <Stack.Screen name="Login" component={LazyLoginScreen} options={{ title: 'Saved Manhwas Completed' }} />
+
+                <Stack.Screen name="Saved Manhwas Ongoing" component={SavedScreenOngoing} options={{ title: 'Saved Manhwas Ongoing' }} />
+                <Stack.Screen name="Saved Manhwas All" component={LazySavedScreenAll} options={{ title: 'Saved Manhwas All' }} />
+                <Stack.Screen name="Saved Manhwas Try" component={LazySavedScreenTry} options={{ title: 'Saved Manhwas Try' }} />
+                <Stack.Screen name="Saved Manhwas Later" component={LazySavedScreenLater} options={{ title: 'Saved Manhwas Later' }} />
+                <Stack.Screen name="Saved Manhwas Hiatus" component={LazySavedScreenHiatus} options={{ title: 'Saved Manhwas Hiatus' }} />
+                <Stack.Screen name="Saved Manhwas UpToDate" component={LazySavedScreenUpToDate} options={{ title: 'Saved Manhwas Up-To-Date' }} />
+                <Stack.Screen name="Saved Manhwas Completed" component={LazySavedScreenCompleted} options={{ title: 'Saved Manhwas Completed' }} />
+                <Stack.Screen name="Login" component={LazyLoginScreen} options={{ title: 'Login' }} />
                 {/* <Stack.Screen name="Latest" component={LatestScreen} /> */}
                 {/* <Stack.Screen name="Saved Manhwas All" component={SavedScreenAll} options={{ title: 'Saved Manhwas All' }} /> */}
                 {/* <Stack.Screen name="Saved Manhwas Try" component={SavedScreenTry} options={{ title: 'Saved Manhwas Try' }} />
