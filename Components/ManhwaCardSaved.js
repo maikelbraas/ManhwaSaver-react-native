@@ -125,7 +125,7 @@ export default React.memo(function ManhwaCardSaved({ item, navigation }) {
     return (
         <View style={styles.itemContainer}>
             <View style={styles.item}>
-                <Image style={styles.logo} source={{ uri: `https://manhwasaver.com/manhwaImages/${item.mid}.webp` }} />
+                <Image style={styles.logo} source={{ uri: `https://manhwasaver.com/4Z017sNnvsPD/${item.mid}.webp` }} />
                 <View style={styles.itemOuter}>
                     <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
                     <View style={styles.item}>
