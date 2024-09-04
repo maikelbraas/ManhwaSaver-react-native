@@ -1,10 +1,13 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { View, TextInput, FlatList, StyleSheet, ActivityIndicator, Text, SafeAreaView } from 'react-native';
+import { View, TextInput, FlatList, StyleSheet, ActivityIndicator, Text, SafeAreaView, Dimensions } from 'react-native';
 import { useManhwas } from '../Components/ManhwaContext';
 import ManhwaCard from '../Components/ManhwaCard';
 import { useAuth } from '../Components/AuthContext';
 
 const SearchScreen = ({ navigation }) => {
+    const { width, height } = Dimensions.get('window');
+    const aspectRatio = height / width;
+    const isTablet = aspectRatio < 1.6;
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -57,6 +60,7 @@ const SearchScreen = ({ navigation }) => {
     }
     const card = useCallback(({ item }) => (<ManhwaCard item={item} navigation={navigation} />), []);
 
+    isTablet ? numOfColumns = 2 : numOfColumns = 1;
     return (
         <SafeAreaView style={styles.container}>
             <TextInput
@@ -70,7 +74,10 @@ const SearchScreen = ({ navigation }) => {
                 <ActivityIndicator size="large" color="#007bff" />
             ) : (
                 <FlatList
+                    key={numOfColumns}
                     keyboardShouldPersistTaps='handled'
+                    numColumns={numOfColumns}
+                    columnWrapperStyle={isTablet ? { justifyContent: 'space-evenly', paddingHorizontal: 10, } : ''}
                     data={searchResultsFiltered}
                     renderItem={card}
                     keyExtractor={item => item.mid}
@@ -90,6 +97,7 @@ const SearchScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        display: 'flex',
         padding: 10,
         backgroundColor: '#121212',
     },

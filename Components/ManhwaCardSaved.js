@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, Keyboard, TouchableOpacity, TextInput, Linking, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, Keyboard, TouchableOpacity, TextInput, Linking, Alert, Dimensions } from 'react-native';
 import React, { useCallback, useState } from 'react';
 import stylesInput from '../Components/InputStyle'
 import { remove, later, log } from './ManhwaHandel';
@@ -9,6 +9,9 @@ import { useAuth } from './AuthContext';
 import { isLoggedIn } from './AuthLogic';
 
 export default React.memo(function ManhwaCardSaved({ item, navigation }) {
+    const { width, height } = Dimensions.get('window');
+    const aspectRatio = height / width;
+    const isTablet = aspectRatio < 1.6;
     const [number, onChangeNumber] = useState('');
     const { fetchSavedManhwas } = useManhwas();
     const { logout } = useAuth();
@@ -123,11 +126,12 @@ export default React.memo(function ManhwaCardSaved({ item, navigation }) {
     }, [item.mid, fetchSavedManhwas, number, navigation, logout, isLoggedIn])
 
     return (
-        <View style={styles.itemContainer}>
+        <View style={isTablet ? styles.itemContainerTablet : styles.itemContainerPhone}>
             <View style={styles.item}>
                 <Image style={styles.logo} source={{ uri: `https://manhwasaver.com/4Z017sNnvsPD/${item.mid}.webp` }} />
                 <View style={styles.itemOuter}>
-                    <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
+                    <Text style={styles.title} numberOfLines={1}
+                        ellipsizeMode="tail">{item.title}</Text>
                     <View style={styles.item}>
                         <View style={styles.itemInner}>
                             <Text style={styles.label}>Status: </Text>
@@ -188,7 +192,12 @@ export default React.memo(function ManhwaCardSaved({ item, navigation }) {
 
 const styles = StyleSheet.create({
 
-    itemContainer: {
+    itemContainerTablet: {
+        flex: 0.45,
+        backgroundColor: '#1e1e1e',
+        marginBottom: 20,
+    },
+    itemContainerPhone: {
         flex: 1,
         backgroundColor: '#1e1e1e',
         marginBottom: 20,
@@ -215,6 +224,8 @@ const styles = StyleSheet.create({
     itemOuter: {
         backgroundColor: '#1e1e1e',
         marginVertical: 8,
+        flex: 1,
+        paddingHorizontal: 10,
         alignItems: 'center',
     },
     itemInner: {
@@ -243,7 +254,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: 'white',
         height: 20,
-        width: 200
     },
     content: {
         color: 'white'

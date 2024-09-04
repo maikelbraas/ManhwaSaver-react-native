@@ -1,4 +1,4 @@
-import { FlatList, SafeAreaView, StyleSheet, View } from 'react-native';
+import { FlatList, SafeAreaView, StyleSheet, View, Dimensions } from 'react-native';
 import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import ManhwaCardSaved from '../../Components/ManhwaCardSaved';
 import { RefreshControl, ScrollView } from 'react-native-gesture-handler';
@@ -7,6 +7,10 @@ import CustomLoadingScreen from '../../Components/CustomLoadingScreen';
 
 
 export default React.memo(function SavedScreenTemplate({ route, navigation }) {
+    const { width, height } = Dimensions.get('window');
+    const aspectRatio = height / width;
+    const isTablet = aspectRatio < 1.6;
+    let numOfColumns = 1;
     const flatListRef = useRef();
     const { savedManhwas, isLoading, fetchSavedManhwas } = useManhwas();
     const [itemHeights, setItemHeights] = useState({});
@@ -46,9 +50,9 @@ export default React.memo(function SavedScreenTemplate({ route, navigation }) {
     });
 
     const renderItem = ({ item }) => (
-        <View onLayout={event => onItemLayout(event, item.mid)}>
-            <ManhwaCardSaved item={item} navigation={navigation} />
-        </View>
+        // <View style={{ display: 'flex', direction: 'row' }} onLayout={event => onItemLayout(event, item.mid)}>
+        <ManhwaCardSaved item={item} navigation={navigation} />
+        // </View>
     );
 
     const renderSingleItem = ({ item }) => (
@@ -75,10 +79,15 @@ export default React.memo(function SavedScreenTemplate({ route, navigation }) {
         );
     }
 
+    isTablet ? numOfColumns = 2 : numOfColumns = 1;
+
     return (
         <SafeAreaView style={styles.container} collapsable={false}>
             <FlatList
+                key={numOfColumns}
                 automaticallyAdjustKeyboardInsets={true}
+                numColumns={numOfColumns}
+                columnWrapperStyle={isTablet ? { justifyContent: 'space-evenly', paddingHorizontal: 10, } : ''}
                 keyboardShouldPersistTaps='handled'
                 data={filteredManhwas}
                 getItemLayout={getItemLayout}
@@ -94,6 +103,8 @@ export default React.memo(function SavedScreenTemplate({ route, navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        display: 'flex',
+        flexDirection: 'row',
         backgroundColor: '#121212',
     },
     loginContainer: {

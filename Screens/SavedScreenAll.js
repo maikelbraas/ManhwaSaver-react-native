@@ -1,4 +1,4 @@
-import { FlatList, SafeAreaView, StyleSheet, View } from 'react-native';
+import { FlatList, SafeAreaView, StyleSheet, View, Dimensions } from 'react-native';
 import React, { useRef, useMemo, useCallback, useEffect, Suspense } from 'react';
 import ManhwaCardSaved from '../Components/ManhwaCardSaved';
 import Pagination from '../Components/Pagination';
@@ -9,6 +9,10 @@ import CustomLoadingScreen from '../Components/CustomLoadingScreen';
 
 
 export default React.memo(function SavedScreenAll({ navigation }) {
+    const { width, height } = Dimensions.get('window');
+    const aspectRatio = height / width;
+    const isTablet = aspectRatio < 1.6;
+    let numOfColumns = 1;
     const ITEM_HEIGHT = 480;
     const scrollRef = useRef();
     const { savedManhwas, isLoading, fetchSavedManhwas, currentPageSaved, setCurrentPageSaved, totalPagesSaved } = useManhwas();
@@ -25,10 +29,17 @@ export default React.memo(function SavedScreenAll({ navigation }) {
         scrollRef.current.scrollToOffset({ y: 0, animated: true });
     }, [setCurrentPageSaved]);
 
+    isTablet ? numOfColumns = 2 : numOfColumns = 1;
+
     return (
         <Suspense fallback={<CustomLoadingScreen />}>
             <SafeAreaView style={styles.container}>
-                <FlatList keyboardShouldPersistTaps='handled'
+                <FlatList
+                    key={numOfColumns}
+                    keyboardShouldPersistTaps='handled'
+                    automaticallyAdjustKeyboardInsets={true}
+                    numColumns={numOfColumns}
+                    columnWrapperStyle={isTablet ? { justifyContent: 'space-evenly', paddingHorizontal: 10, } : ''}
                     data={savedManhwas.slice((currentPageSaved - 1) * 10, currentPageSaved * 10)}
                     keyExtractor={keyExtractor}
                     initialNumToRender={3}
@@ -55,6 +66,7 @@ export default React.memo(function SavedScreenAll({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        display: 'flex',
         backgroundColor: '#121212',
     },
     loginContainer: {

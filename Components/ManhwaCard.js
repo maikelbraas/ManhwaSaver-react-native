@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, Dimensions } from 'react-native';
 import stylesButton from '../Components/InputStyle'
 import { tryManhwa } from './ManhwaHandel';
 import { useManhwas } from '../Components/ManhwaContext';
@@ -11,6 +11,9 @@ import { isLoggedIn } from './AuthLogic';
 
 
 export default function ManhwaCard({ item, navigation }) {
+    const { width, height } = Dimensions.get('window');
+    const aspectRatio = height / width;
+    const isTablet = aspectRatio < 1.6;
     const { fetchAllManhwas, currentPageAll, fetchLatest, currentPageLatest } = useManhwas();
     const [isExpanded, setIsExpanded] = useState(false);
     const route = useRoute();
@@ -72,7 +75,7 @@ export default function ManhwaCard({ item, navigation }) {
 
 
     return (
-        <View style={styles.itemContainer}>
+        <View style={isTablet ? styles.itemContainerTablet : styles.itemContainerPhone}>
             <View style={styles.item}>
                 <Image style={styles.logo} source={{ uri: `https://manhwasaver.com/4Z017sNnvsPD/${item.mid}.webp` }} />
                 <View style={[
@@ -133,9 +136,16 @@ export default function ManhwaCard({ item, navigation }) {
 
 const styles = StyleSheet.create({
 
-    itemContainer: {
+    itemContainerTablet: {
+        flex: 0.5,
+        marginHorizontal: 10,
         backgroundColor: '#1e1e1e',
-        marginBottom: 20
+        marginBottom: 20,
+    },
+    itemContainerPhone: {
+        flex: 1,
+        backgroundColor: '#1e1e1e',
+        marginBottom: 20,
     },
     titleContainer: {
         borderBottomWidth: 2,
@@ -165,20 +175,19 @@ const styles = StyleSheet.create({
     },
     itemScroll: {
         indicatorStyle: 'white',
-        paddingHorizontal: 4,
+        padding: 4,
         height: 210,
-        flexDirection: 'column'
+        flexDirection: 'column',
+        flexShrink: 1
     },
     title: {
         fontSize: 18,
         textDecorationLine: 'underline',
         color: 'white',
         height: 20,
-        width: 210
     },
     content: {
-        color: 'white',
-        width: 210
+        color: 'white'
     },
     misc: {
         color: 'white',

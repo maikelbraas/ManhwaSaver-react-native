@@ -1,4 +1,4 @@
-import { FlatList, SafeAreaView, StyleSheet, View } from 'react-native';
+import { FlatList, SafeAreaView, StyleSheet, View, Dimensions } from 'react-native';
 import React, { useRef, useCallback, useMemo, useEffect, Suspense } from 'react';
 import ManhwaCard from '../Components/ManhwaCard';
 import Pagination from '../Components/Pagination';
@@ -9,6 +9,10 @@ import { useAuth } from '../Components/AuthContext';
 
 
 export default React.memo(function LatestScreen({ navigation }) {
+    const { width, height } = Dimensions.get('window');
+    const aspectRatio = height / width;
+    const isTablet = aspectRatio < 1.6;
+    let numOfColumns = 1;
     const ITEM_HEIGHT = 480;
     const scrollRef = useRef();
     const { latestManhwas, isLoading, fetchLatest, currentPageLatest, totalPagesLatest, setCurrentPageLatest, savedManhwas } = useManhwas();
@@ -51,9 +55,14 @@ export default React.memo(function LatestScreen({ navigation }) {
     if (isLoading || latestManhwas.length === 0) {
         return <CustomLoadingScreen text='Loading manhwas...' />;
     }
+    isTablet ? numOfColumns = 2 : numOfColumns = 1;
     return (
         <SafeAreaView style={styles.container}>
-            <FlatList keyboardShouldPersistTaps='handled'
+            <FlatList
+                key={numOfColumns}
+                keyboardShouldPersistTaps='handled'
+                numColumns={numOfColumns}
+                columnWrapperStyle={isTablet ? { justifyContent: 'space-evenly', paddingHorizontal: 10, } : ''}
                 data={latestManhwasFiltered.slice((currentPageLatest - 1) * 10, currentPageLatest * 10)}
                 keyExtractor={keyExtractor}
                 initialNumToRender={3}
@@ -80,6 +89,7 @@ export default React.memo(function LatestScreen({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        display: 'flex',
         backgroundColor: '#121212',
     },
     loginContainer: {
